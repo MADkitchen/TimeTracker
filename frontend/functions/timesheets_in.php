@@ -34,17 +34,17 @@ function build_header($year = null, $week = null) {
     $retval_option = '<option value="%1$s" %2$s>%3$s</option>';
 
     $retval1 = '';
-    foreach (MADkit\Helpers\Time::get_years($year) as $no => $item) {
+    foreach (MADkitchen\Helpers\Time::get_years($year) as $no => $item) {
         $retval1 .= sprintf($retval_option, $item['year'], selected($item['selected'], true, false), $item['year']);
     }
     $retval2 = '';
-    foreach (MADkit\Helpers\Time::get_weeks($year, $week) as $no => $item) {
+    foreach (MADkitchen\Helpers\Time::get_weeks($year, $week) as $no => $item) {
         $retval2 .= sprintf($retval_option, $no, selected($item['selected'], true, false), $item['range']);
     }
 
     $buffer = sprintf($retval_th, sprintf($retval_select, 'year', $retval1) . sprintf($retval_select, 'week', $retval2));
 
-    foreach (MADkit\Helpers\Time::get_days($year, $week) as $no => $item) {
+    foreach (MADkitchen\Helpers\Time::get_days($year, $week) as $no => $item) {
         $buffer .= '<th id="ts_weekday_' . $no . '" data-date="' . $item['date'] . '" class="w3-padding-16" style="width:10%">';
         $buffer .= '<div class="w3-block">' . $item['name'] . '</div>';
         $buffer .= '<div class="w3-block w3-large">' . $item['number'] . '</div>';
@@ -56,7 +56,7 @@ function build_header($year = null, $week = null) {
 
 function build_table($year = null, $week = null) {
     global $current_user;
-    $days = MADkit\Helpers\Time::get_days($year, $week);
+    $days = MADkitchen\Helpers\Time::get_days($year, $week);
 
     $x = ts_query_items([
         'user_name' => $current_user->user_login,

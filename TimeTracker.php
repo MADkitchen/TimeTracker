@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace MADkit\Module;
+namespace MADkitchen\Module;
 
 // Exit if accessed directly.
 defined('ABSPATH') || exit;
 
-class TimeTracker extends \MADkit\Modules\Module {
+class TimeTracker extends \MADkitchen\Modules\Module {
 
     protected $dependencies = [
         'BerlinDB',
