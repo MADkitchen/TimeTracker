@@ -23,32 +23,32 @@ defined('ABSPATH') || exit;
 //Helpers
 function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_type = 'name') {
     if (is_array($tags)) {
-        return MADkit\Modules\Handler::get_table_column_prop_array_by_key('ett_timetables', $tags, $prop, $key_out_type, $target);
+        return MADkit\Modules\Handler::get_table_column_prop_array_by_key('TimeTracker','timetables', $tags, $prop, $key_out_type, $target);
     } else {
-        return MADkit\Modules\Handler::get_table_column_prop_by_key('ett_timetables', $tags, $prop);
+        return MADkit\Modules\Handler::get_table_column_prop_by_key('TimeTracker','timetables', $tags, $prop);
     }
 }
 
 function ts_query_items($arg=[]){
-    return MADkit\Modules\Handler::$active_modules['ett_timetables']['class']->query($arg)->items;
+    return MADkit\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetables',$arg)->items;
 }
 
 function ts_update_items($arg){
-    return MADkit\Modules\Handler::$active_modules['ett_timetables']['class']->query()->update_item($arg);
+    return MADkit\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetables')->update_item($arg);
 }
 
 function ts_add_items($arg){
-    return MADkit\Modules\Handler::$active_modules['ett_timetables']['class']->query()->add_item($arg);
+    return MADkit\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetables')->add_item($arg);
 }
 
 function ts_get_activity_name($arg){
-    return MADkit\Modules\Handler::$active_modules['ett_activities']['class']->get_activity_name($arg);
+    return MADkit\Modules\Handler::$active_modules['TimeTracker']['class']->get_activity_name($arg);
 }
 
 function ts_get_activity_group($arg){
-    return MADkit\Modules\Handler::$active_modules['ett_activities']['class']->get_activity_group($arg);
+    return MADkit\Modules\Handler::$active_modules['TimeTracker']['class']->get_activity_group($arg);
 }
 
 function ts_get_activities(){
-    return MADkit\Modules\Handler::$active_modules['ett_activities']['class']->get_activities();
+    return MADkit\Modules\Handler::$active_modules['TimeTracker']['class']->get_activities();
 }
