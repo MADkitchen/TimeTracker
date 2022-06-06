@@ -114,7 +114,7 @@ function build_table($year = null, $week = null) {
     foreach ($table as $key => $value) {
         build_row(
                 $rows[$key],
-                $value
+                ts_resolve_relation($key,$value),
         );
     }
 

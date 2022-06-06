@@ -184,7 +184,7 @@ function get_selectors_data($filter = [], $date_range = []) {
 
         $data_tot[$a] = [];
         foreach ($x as $item) {
-            $data_tot[$a][] = $item[$a];
+            $data_tot[$a][] = ts_resolve_relation($a,$item[$a]);
         }
     }
 
@@ -234,7 +234,7 @@ function chart1_get_data($args = [], $date_range = []) {
     $w = [];
     foreach ($x as $z) {
         foreach ($z as $key => $value) {
-            $w[$key][] = $value;
+            $w[$key][] = ts_resolve_relation($key,$value);
         }
     }
 

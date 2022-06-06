@@ -29,24 +29,33 @@ function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_t
     }
 }
 
-function ts_query_items($arg=[]){
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetables',$arg)->items;
+function ts_query_items($arg=[],$table='timetables'){
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table,$arg)->items;
 }
 
-function ts_update_items($arg){
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetables')->update_item($arg);
+function ts_update_items($arg,$table='timetables'){
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table)->update_item($arg);
 }
 
-function ts_add_items($arg){
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetables')->add_item($arg);
+function ts_add_items($arg,$table='timetables'){
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table)->add_item($arg);
 }
 
+function ts_resolve_relation($id, $column, $target = null, $table='timetables'){
+    return MADkitchen\Modules\Handler::resolve_internal_relation('TimeTracker', $table, $id, $column, $target);
+}
+
+//TODO: generalize the following 3
 function ts_get_activity_name($arg){
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->get_activity_name($arg);
+    $items=ts_query_items(['activity_id'=>$activity_id, 'groupby' =>['activity_name']]);
+    $retval=isset($items[0]['activity_name'])?$items[0]['activity_name']:'';
+    return $retval;
 }
 
-function ts_get_activity_group($arg){
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->get_activity_group($arg);
+function ts_get_activity_group($activity_id){
+    $items=ts_query_items(['activity_id'=>$activity_id, 'groupby' =>['activity_group']]);
+    $retval=isset($items[0]['activity_group'])?$items[0]['activity_group']:'';
+    return $retval;
 }
 
 function ts_get_activities(){
