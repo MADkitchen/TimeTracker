@@ -38,13 +38,10 @@ class TimeTracker extends \MADkitchen\Modules\Module {
 			id  bigint(20) NOT NULL AUTO_INCREMENT,
 			activity_id            bigint(20)   NOT NULL,
                         date_rec  DATE   NOT NULL,
-			activity_group            bigint(20)   NOT NULL,
                         user_group            tinytext   NOT NULL,
-                        job_no            bigint(20)   NOT NULL,
                         time_units            decimal(4,2)   NOT NULL,
                         user_name            tinytext   NOT NULL,
                         user_role            tinytext   NOT NULL,
-                        job_wbs            bigint(20)   NOT NULL,
                         job_tag            bigint(20)   NOT NULL,
 			PRIMARY KEY (id)
 			"
@@ -81,17 +78,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'searchable' => true,
                     'sortable' => true,
                 ],
-                //activity_group
-                'activity_group' => [
-                    'name' => 'activity_group',
-                    'description' => 'Activities group',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'activity_group',
-                ],
                 //user_group
                 'user_group' => [
                     'name' => 'user_group',
@@ -100,17 +86,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'unsigned' => true,
                     'searchable' => true,
                     'sortable' => true,
-                ],
-                //job_no
-                'job_no' => [
-                    'name' => 'job_no',
-                    'description' => 'Job number',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'job_no',
                 ],
                 //time_units
                 'time_units' => [
@@ -139,17 +114,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'unsigned' => true,
                     'searchable' => true,
                     'sortable' => true,
-                ],
-                //job_wbs
-                'job_wbs' => [
-                    'name' => 'job_wbs',
-                    'description' => 'Job WBS',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'job_wbs',
                 ],
                 //job_tag
                 'job_tag' => [
@@ -225,7 +189,7 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
             ],
         ],
-        'activities_group' => [
+        'activity_group' => [
             'schema' => "
 			id  bigint(20) NOT NULL AUTO_INCREMENT,
 			activity_group            tinytext   NOT NULL,
@@ -370,7 +334,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
 			job_tag            tinytext   NOT NULL,
                         job_tag_name            tinytext   NOT NULL,
                         job_tag_description            tinytext   NOT NULL,
-			job_no            bigint(20)   NOT NULL,
                         job_wbs            bigint(20)   NOT NULL,
 			PRIMARY KEY (id)
 			"
@@ -404,17 +367,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'sortable' => true,
                 ],
                 //job_description
-                'job_no' => [
-                    'name' => 'job_no',
-                    'description' => 'Job description',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'job_no',
-                ],
-                //job_description
                 'job_wbs' => [
                     'name' => 'job_wbs',
                     'description' => 'Job description',
@@ -424,6 +376,84 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'searchable' => true,
                     'sortable' => true,
                     'relation'=> 'job_wbs',
+                ],
+            ],
+        ],
+        'user_group' => [
+            'schema' => "
+			id  bigint(20) NOT NULL AUTO_INCREMENT,
+                        user_group            tinytext   NOT NULL,
+			user_group_name            tinytext   NOT NULL,
+                        user_group_desc            tinytext   NOT NULL,
+			PRIMARY KEY (id)
+			"
+            ,
+            'columns' => [
+                //job_no
+                'user_group' => [
+                    'name' => 'user_group',
+                    'description' => 'Job number',
+                    'type' => 'tinytext',
+                    'unsigned' => true,
+                    'searchable' => true,
+                    'sortable' => true,
+                ],
+                //job_description
+                'user_group_name' => [
+                    'name' => 'user_group_name',
+                    'description' => 'Job description',
+                    'type' => 'tinytext',
+                    'unsigned' => true,
+                    'searchable' => true,
+                    'sortable' => true,
+                ],
+                //job_description
+                'user_group_desc' => [
+                    'name' => 'user_group_desc',
+                    'description' => 'Job description',
+                    'type' => 'tinytext',
+                    'unsigned' => true,
+                    'searchable' => true,
+                    'sortable' => true,
+                ],
+            ],
+        ],
+        'user_role' => [
+            'schema' => "
+			id  bigint(20) NOT NULL AUTO_INCREMENT,
+                        user_role            tinytext   NOT NULL,
+			user_role_name            tinytext   NOT NULL,
+                        user_role_desc            tinytext   NOT NULL,
+			PRIMARY KEY (id)
+			"
+            ,
+            'columns' => [
+                //job_no
+                'user_role' => [
+                    'name' => 'user_role',
+                    'description' => 'Job number',
+                    'type' => 'tinytext',
+                    'unsigned' => true,
+                    'searchable' => true,
+                    'sortable' => true,
+                ],
+                //job_description
+                'user_role_name' => [
+                    'name' => 'user_role_name',
+                    'description' => 'Job description',
+                    'type' => 'tinytext',
+                    'unsigned' => true,
+                    'searchable' => true,
+                    'sortable' => true,
+                ],
+                //job_description
+                'user_role_desc' => [
+                    'name' => 'user_role_desc',
+                    'description' => 'Job description',
+                    'type' => 'tinytext',
+                    'unsigned' => true,
+                    'searchable' => true,
+                    'sortable' => true,
                 ],
             ],
         ],

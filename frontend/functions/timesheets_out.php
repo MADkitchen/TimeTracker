@@ -67,8 +67,8 @@ function populate_selectors($filter = [], $date_range = []) {
     $before = '';
 
     if (isset($date_range['range'])) {
-        $min = !isset($date_range['range']['min']) ?: $date_range['range']['min'];
-        $max = !isset($date_range['range']['max']) ?: $date_range['range']['max'];
+        $min = !isset($date_range['range']['min']) ? $min : $date_range['range']['min'];
+        $max = !isset($date_range['range']['max']) ? $max : $date_range['range']['max'];
         $after = isset($date_range['range']['after']) ? $date_range['range']['after'] : $date_range['range']['min'];
         $before = isset($date_range['range']['before']) ? $date_range['range']['before'] : $date_range['range']['max'];
     }
@@ -184,7 +184,7 @@ function get_selectors_data($filter = [], $date_range = []) {
 
         $data_tot[$a] = [];
         foreach ($x as $item) {
-            $data_tot[$a][] = ts_resolve_relation($a,$item[$a]);
+            $data_tot[$a][] = ts_resolve_relation($a, $item[$a]);
         }
     }
 
@@ -234,7 +234,7 @@ function chart1_get_data($args = [], $date_range = []) {
     $w = [];
     foreach ($x as $z) {
         foreach ($z as $key => $value) {
-            $w[$key][] = ts_resolve_relation($key,$value);
+            $w[$key][] = ts_resolve_relation($key, $value);
         }
     }
 
