@@ -66,7 +66,7 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'unsigned' => true,
                     'searchable' => true,
                     'sortable' => true,
-                    'relation'=> 'activity_id',
+                    'relation' => 'activity_id',
                 ],
                 //date
                 'date_rec' => [
@@ -124,336 +124,7 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                     'unsigned' => true,
                     'searchable' => true,
                     'sortable' => true,
-                    'relation'=> 'job_wbs',
-                ],
-            ],
-        ],
-        'activity_id' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-			activity_id            tinytext   NOT NULL,
-                        activity_id_name            tinytext   NOT NULL,
-			activity_group            bigint(20)   NOT NULL,
-                        activity_id_desc            tinytext   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //id
-                'id' => [
-                    'name' => 'id',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'extra' => 'auto_increment',
-                    'primary' => true,
-                    'sortable' => true,
-                ],
-                //activity_id
-                'activity_id' => [
-                    'name' => 'activity_id',
-                    'description' => 'Activity ID',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //activity_id
-                'activity_id_name' => [
-                    'name' => 'activity_id_name',
-                    'description' => 'Activity name',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //activity_group
-                'activity_group' => [
-                    'name' => 'activity_group',
-                    'description' => 'Activities group',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'activity_group',
-                ],
-                //activity_desc
-                'activity_id_desc' => [
-                    'name' => 'activity_id_desc',
-                    'description' => 'User cluster',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-            ],
-        ],
-        'activity_group' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-			activity_group            tinytext   NOT NULL,
-                        activity_group_name            tinytext   NOT NULL,
-                        activity_group_desc            tinytext   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //id
-                'id' => [
-                    'name' => 'id',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'extra' => 'auto_increment',
-                    'primary' => true,
-                    'sortable' => true,
-                ],
-                //activity_group
-                'activity_group' => [
-                    'name' => 'activity_group',
-                    'description' => 'Activities',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //activity_group
-                'activity_group_name' => [
-                    'name' => 'activity_group_name',
-                    'description' => 'Activities group',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //activity_desc
-                'activity_group_desc' => [
-                    'name' => 'activity_group_desc',
-                    'description' => 'User cluster',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-            ],
-        ],
-        'job_no' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-			job_no            tinytext   NOT NULL,
-			job_name            tinytext   NOT NULL,
-                        job_desc            tinytext   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //job_no
-                'job_no' => [
-                    'name' => 'job_no',
-                    'description' => 'Job number',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_wbs
-                'job_name' => [
-                    'name' => 'job_name',
-                    'description' => 'Job WBS',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_tag
-                'job_desc' => [
-                    'name' => 'job_desc',
-                    'description' => 'Job tags',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-            ],
-        ],
-        'job_wbs' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-			job_wbs            tinytext   NOT NULL,
-                        job_wbs_name            tinytext   NOT NULL,
-			job_wbs_desc            tinytext   NOT NULL,
-                        job_no            bigint(20)   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //job_no
-                'job_wbs' => [
-                    'name' => 'job_wbs',
-                    'description' => 'Job number',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'job_wbs_name' => [
-                    'name' => 'job_wbs_name',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_wbs_desc
-                'job_wbs_desc' => [
-                    'name' => 'job_wbs_desc',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_no
-                'job_no' => [
-                    'name' => 'job_no',
-                    'description' => 'Job description',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'job_no',
-                ],
-            ],
-        ],
-        'job_tag' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-			job_tag            tinytext   NOT NULL,
-                        job_tag_name            tinytext   NOT NULL,
-                        job_tag_description            tinytext   NOT NULL,
-                        job_wbs            bigint(20)   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //job_no
-                'job_tag' => [
-                    'name' => 'job_tag',
-                    'description' => 'Job number',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'job_tag_name' => [
-                    'name' => 'job_tag_name',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'job_tag_desc' => [
-                    'name' => 'job_tag_desc',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'job_wbs' => [
-                    'name' => 'job_wbs',
-                    'description' => 'Job description',
-                    'type' => 'bigint',
-                    'length' => '20',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                    'relation'=> 'job_wbs',
-                ],
-            ],
-        ],
-        'user_group' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-                        user_group            tinytext   NOT NULL,
-			user_group_name            tinytext   NOT NULL,
-                        user_group_desc            tinytext   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //job_no
-                'user_group' => [
-                    'name' => 'user_group',
-                    'description' => 'Job number',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'user_group_name' => [
-                    'name' => 'user_group_name',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'user_group_desc' => [
-                    'name' => 'user_group_desc',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-            ],
-        ],
-        'user_role' => [
-            'schema' => "
-			id  bigint(20) NOT NULL AUTO_INCREMENT,
-                        user_role            tinytext   NOT NULL,
-			user_role_name            tinytext   NOT NULL,
-                        user_role_desc            tinytext   NOT NULL,
-			PRIMARY KEY (id)
-			"
-            ,
-            'columns' => [
-                //job_no
-                'user_role' => [
-                    'name' => 'user_role',
-                    'description' => 'Job number',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'user_role_name' => [
-                    'name' => 'user_role_name',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
-                ],
-                //job_description
-                'user_role_desc' => [
-                    'name' => 'user_role_desc',
-                    'description' => 'Job description',
-                    'type' => 'tinytext',
-                    'unsigned' => true,
-                    'searchable' => true,
-                    'sortable' => true,
+                    'relation' => 'job_wbs',
                 ],
             ],
         ],
@@ -472,5 +143,22 @@ class TimeTracker extends \MADkitchen\Modules\Module {
             'slug' => 'timesheets/out',
         ],
     ];
+
+    public function __construct() {
+
+        $this->table_data = array_merge(
+                $this->table_data,
+                \MADkitchen\Modules\Handler::get_std_lookup_table('activity_id', "Activities", [['tag' => 'activity_group']]),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('activity_group', "Group of activities"),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('job_no', "Job number"),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('job_wbs', "Job WBS", [['tag' => 'job_no']]),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('job_tag', "Job tag", [['tag' => 'job_wbs']]),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('user_group', "Group of user"),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('user_role', "Role of users"),
+                \MADkitchen\Modules\Handler::get_std_lookup_table('user_no', "Users",[['tag' => 'user_role'],['tag' => 'user_group']]),
+        );
+
+        parent::__construct();
+    }
 
 }
