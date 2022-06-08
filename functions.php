@@ -67,6 +67,7 @@ function ts_get_activities() {
         $activity_id_name = $item['activity_id_name'];//ts_resolve_relation('activity_id_name', $item['activity_id_name'], null, 'activity_id');
         $activity_group = ts_resolve_relation('activity_group', $item['activity_group'], null, 'activity_id');
         $retval[$activity_group][$activity_id] = $activity_id_name;
+        $retval[$activity_group]['name']=ts_resolve_relation('activity_group', $item['activity_group'], 'activity_group_name', 'activity_id');
     }
     return $retval;
 }
