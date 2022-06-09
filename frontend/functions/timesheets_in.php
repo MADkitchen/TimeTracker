@@ -67,8 +67,8 @@ function build_table($year = null, $week = null) {
         'groupby' => ts_get_column_prop([
             'activity_id',
             'date_rec',
-            'job_no',
-            'job_wbs',
+            //'job_no',
+            //'job_wbs',
             'job_tag',
             'id'
         ]),

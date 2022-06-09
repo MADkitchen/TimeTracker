@@ -23,9 +23,9 @@ defined('ABSPATH') || exit;
 //Helpers
 function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_type = 'name') {
     if (is_array($tags)) {
-        return MADkitchen\Modules\Handler::get_table_column_prop_array_by_key('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
+        return MADkitchen\Database\Handler::get_table_column_prop_array_by_key('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
     } else {
-        return MADkitchen\Modules\Handler::get_table_column_prop_by_key('TimeTracker', 'timetable', $tags, $prop);
+        return MADkitchen\Database\Handler::get_table_column_prop_by_key('TimeTracker', 'timetable', $tags, $prop);
     }
 }
 
@@ -42,7 +42,7 @@ function ts_add_items($arg, $table = 'timetable') {
 }
 
 function ts_resolve_relation($column, $id, $target = null, $table = 'timetable') {
-    return MADkitchen\Modules\Handler::resolve_internal_relation('TimeTracker', $table, $column, $id, $target);
+    return MADkitchen\Database\Handler::resolve_internal_relation('TimeTracker', $table, $column, $id, $target);
 }
 
 //TODO: generalize the following 3

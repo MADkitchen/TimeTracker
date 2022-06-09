@@ -148,14 +148,14 @@ class TimeTracker extends \MADkitchen\Modules\Module {
 
         $this->table_data = array_merge(
                 $this->table_data,
-                \MADkitchen\Modules\Handler::get_std_lookup_table('activity_id', "Activities", [['tag' => 'activity_group']]),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('activity_group', "Group of activities"),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('job_no', "Job number"),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('job_wbs', "Job WBS", [['tag' => 'job_no']]),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('job_tag', "Job tag", [['tag' => 'job_wbs']]),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('user_group', "Group of user"),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('user_role', "Role of users"),
-                \MADkitchen\Modules\Handler::get_std_lookup_table('user_no', "Users",[['tag' => 'user_role'],['tag' => 'user_group']]),
+                \MADkitchen\Database\Handler::get_std_lookup_table('activity_id', "Activities", [['tag' => 'activity_group']]),
+                \MADkitchen\Database\Handler::get_std_lookup_table('activity_group', "Group of activities"),
+                \MADkitchen\Database\Handler::get_std_lookup_table('job_no', "Job number"),
+                \MADkitchen\Database\Handler::get_std_lookup_table('job_wbs', "Job WBS", [['tag' => 'job_no']]),
+                \MADkitchen\Database\Handler::get_std_lookup_table('job_tag', "Job tag", [['tag' => 'job_wbs']]),
+                \MADkitchen\Database\Handler::get_std_lookup_table('user_group', "Group of user"),
+                \MADkitchen\Database\Handler::get_std_lookup_table('user_role', "Role of users"),
+                \MADkitchen\Database\Handler::get_std_lookup_table('user_no', "Users",[['tag' => 'user_role'],['tag' => 'user_group']]),
         );
 
         parent::__construct();
