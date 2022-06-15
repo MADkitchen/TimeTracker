@@ -25,12 +25,8 @@ defined('ABSPATH') || exit;
         <div class="w3-modal-content">
             <div class="w3-button w3-red w3-ripple w3-block w3-xlarge"" onclick="jQuery('#ts_modal_newrow').hide()" style="padding:0; margin:0">&times;</div>
             <div class="w3-row-padding w3-red w3-center"" style="padding:0; margin:0">
-                <select id="ts_modal_select_job_no" name="ts_modal_select_job" class="w3-button w3-third w3-ripple w3-block w3-large w3-padding-8" style="padding:0; margin:0">
-                    <option value="<?php //TODO get_job  ?>" ><?php //TODO get_job  ?></option>
-                </select><select id="ts_modal_select_job_wbs" name="ts_modal_select_wbs" class="w3-button w3-third w3-ripple w3-block w3-large w3-padding-8" style="padding:0; margin:0">
-                    <option value="<?php //TODO get_wbs  ?>" ><?php //TODO get_wbs  ?></option>
-                </select><select id="ts_modal_select_job_tag" name="ts_modal_select_tag" class="w3-button w3-third w3-ripple w3-block w3-large w3-padding-8" style="padding:0; margin:0">
-                    <option value="base">TAG base</option>
+                <select id="ts_modal_select_job_tag" name="ts_modal_select_job_tag" class="w3-button w3-ripple w3-block w3-large w3-padding-8" style="padding:0; margin:0">
+                    <?php get_job_tags() ?>
                 </select>
             </div><div><input type="search" placeholder="Search.." id="ts_modal_search" onkeyup="filter(jQuery(this).val())" class="w3-white w3-input" style="background-image: url('<?php
                 global $mk_plugin_url; //TODO: cleanup

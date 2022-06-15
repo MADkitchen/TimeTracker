@@ -64,14 +64,7 @@ function build_table($year = null, $week = null) {
         'sum' => [
             'time_units'
         ],
-        'groupby' => ts_get_column_prop([
-            'activity_id',
-            'date_rec',
-            //'job_no',
-            //'job_wbs',
-            'job_tag',
-            'id'
-        ]),
+        'groupby' => ts_get_column_prop(array_merge(get_timesheet_vars(), ['date_rec', 'id'])),
         'date_query' => [
             'column' => ts_get_column_prop('date_rec'),
             [
@@ -91,10 +84,18 @@ function build_table($year = null, $week = null) {
             $i < 7;
             $i++) {
         $subtotals[$i] = 0;
+
+        $extra_cols = array_diff(get_timesheet_vars(), get_row_label_id());
+
+        $tot_cols = get_timesheet_vars();
+
         foreach ($x as $item) {
             if ($item['date_rec'] == $days[$i]['date']) {
+
+                ts_add_external_columns_to_query_res($extra_cols, get_row_label_id(), $item);
+
                 $label = get_row_label_id($item);
-                $label_array = ts_get_column_prop(get_row_label_id(), 'name', $item);
+                $label_array = ts_get_column_prop($tot_cols, 'name', $item);
                 if (!array_key_exists($label, $rows)) {
                     $rows[$label] = $label_array;
                 }
@@ -114,11 +115,21 @@ function build_table($year = null, $week = null) {
     foreach ($table as $key => $value) {
         build_row(
                 $rows[$key],
-                ts_resolve_relation($key,$value),
+                $value,
         );
     }
 
     build_last_row($total);
+}
+
+function get_timesheet_vars() {
+    return [
+        'activity_id',
+        'activity_id_name',
+        'job_no',
+        'job_wbs',
+        'job_tag'
+    ];
 }
 
 function build_subtotals_row($subtotals = array()) {
@@ -150,20 +161,48 @@ function build_last_row($total = 0) {
     echo sprintf('<tr>%s</tr>', $retval);
 }
 
+function get_job_tags() { //filter query by user later
+    $tags = ts_get_column_prop(['job_no', 'job_wbs', 'job_tag']);
+    $w = [];
+    foreach ($tags as $tag) {
+        $x = ts_query_items(
+                [
+                    //'count' => true,
+                    'groupby' => [
+                        'id', //TODO: generalize id
+                    ],
+                    'orderby' => [
+                        $tag,
+                    ],
+                    'order' => 'ASC',
+                ],
+                ts_get_table_source($tag)
+        );
+
+        foreach ($x as $row) {
+            //optimize conversion to entries
+            $w[$tag][] = ts_get_entry_by_row($tag, $row);
+        }
+    }
+
+    foreach ($w['job_tag'] as $item) {
+        $label = get_label($w, $item, 'job_tag');
+        echo "<option value=\"{$item->value}\" data-key=\"{$item->key}\">$label</option>";
+    }
+}
+
 function get_row_label_id($target = null) {
     $array = [
-        'job_no',
-        'job_wbs',
         'job_tag',
         'activity_id'
     ];
 
     if (is_array($target)) {
-        return implode('', array_map(function ($x)use ($target) {
+        return implode('_', array_map(function ($x)use ($target) {
                     return $target[$x];
                 }, $array));
     } else if ($target === 'print_js') {
-        return implode('+', ts_get_column_prop($array));
+        return implode('+"_"+', ts_get_column_prop($array));
     } else if (is_null($target)) {
         return ts_get_column_prop($array);
     }
@@ -171,10 +210,24 @@ function get_row_label_id($target = null) {
 
 function build_row($data, $values = array()) {
 
-    $labels = get_row_label_id();
+    $labels = ts_get_column_prop(get_timesheet_vars());
+    $row_id = get_row_label_id($data);
+
+    //Resolve
+    if (!empty($data['job_tag'])) {
+        $data['job_no'] = ts_get_column_value_by_id('job_no', $data['job_no']);
+        $data['job_wbs'] = ts_get_column_value_by_id('job_wbs', $data['job_wbs']);
+        $data['job_tag'] = ts_get_column_value_by_id('job_tag', $data['job_tag']);
+    }
+
+    if (!empty($data['activity_id'])) {
+        $data['activity_id_name'] = ts_get_column_value_by_id('activity_id_name', $data['activity_id_name']);
+        $data['activity_id'] = ts_get_column_value_by_id('activity_id', $data['activity_id']);
+    }
+
 
     $retval = sprintf('<tr id="ts_row_%1$s" data-%2$s="%3$s" data-%4$s="%5$s" data-%6$s="%7$s" data-%8$s="%9$s">',
-            get_row_label_id($data),
+            $row_id,
             $labels['job_no'],
             $data[$labels['job_no']],
             $labels['job_wbs'],
@@ -191,7 +244,7 @@ function build_row($data, $values = array()) {
     $retval .= '<div class="w3-third">' . $data[$labels['job_wbs']] . '</div>';
     $retval .= '<div class="w3-third">' . $data[$labels['job_tag']] . '</div>';
     $retval .= '</div>';
-    $retval .= '<div class="w3-block w3-padding-16 w3-large">' . $data[$labels['activity_id']] . ' - ' . ts_get_activity_name($data[$labels['activity_id']]) . '</div>';
+    $retval .= '<div class="w3-block w3-padding-16 w3-large">' . $data[$labels['activity_id']] . ' - ' . $data[$labels['activity_id_name']] . '</div>';
     $retval .= '</td>';
 
     for ($i = 0;
@@ -224,7 +277,7 @@ function fill_activitylist() {
             if ($subkey == 'name') {
                 continue;
             }
-            $retval .= "<div class=\"w3-button w3-block w3-large w3-left-align\" id=\"ts_modal-item\" data-activity_id=\"$subkey\">$subkey - $subvalue</div>";
+            $retval .= "<div class=\"w3-button w3-block w3-large w3-left-align\" id=\"ts_modal-item\" data-key=\"$subkey\">{$subvalue['no']} - {$subvalue['name']}</div>";
         }
         $retval .= '</div>';
     }
@@ -238,9 +291,6 @@ function ajax_send_to_db() {
     global $current_user;
 
     if (isset($_POST['date_rec']) &&
-            isset($_POST['job_no']) &&
-            isset($_POST['job_wbs']) &&
-            isset($_POST['job_tag']) &&
             isset($_POST['activity_id']) &&
             isset($_POST['job_tag'])) {
 
@@ -261,10 +311,10 @@ function ajax_send_to_db() {
             $retval = ts_add_items([
                 'activity_id' => $_POST['activity_id'],
                 'date_rec' => $_POST['date_rec'],
-                'activity_group' => ts_get_activity_group($_POST['activity_id']),
+                //'activity_group' => ts_get_activity_group($_POST['activity_id']),
                 'user_group' => 'y', //TODO: add wp option
-                'job_no' => $_POST['job_no'],
-                'job_tag' => $_POST['job_tag'],
+                //'job_no' => $_POST['job_no'],
+                //'job_tag' => $_POST['job_tag'],
                 'time_units' => $_POST['time_units'],
                 'user_name' => $current_user->user_login, //TODO: check if better $current_user->display_name
                 'user_role' => 'x', //TODO: add wp option
@@ -281,13 +331,14 @@ function ajax_send_to_db() {
 }
 
 function ajax_build_row() {
-    if (isset($_POST['job_no']) &&
-            isset($_POST['job_wbs']) &&
-            isset($_POST['job_tag']) &&
+    if (isset($_POST['job_tag']) &&
             isset($_POST['activity_id'])) {
 
+        $extra_cols = array_diff(get_timesheet_vars(), get_row_label_id());
+        $item = ts_get_column_prop(get_row_label_id(), 'name', $_POST);
+        ts_add_external_columns_to_query_res($extra_cols, get_row_label_id(), $item);
 
-        build_row(ts_get_column_prop(get_row_label_id(), 'name', $_POST));
+        build_row($item);
     } else {
         return false;
     }
@@ -313,11 +364,11 @@ function js_build_activity_click() {
     unset($array['activity_id']);
     foreach ($array as $item) {
         $item = ts_get_column_prop($item);
-        $retval .= "    const $item = $('#ts_modal_select_$item option:selected').val();\n";
+        $retval .= "    const $item = $('#ts_modal_select_$item option:selected').attr('data-key');\n";
     }
     $item = ts_get_column_prop('activity_id');
 
-    $retval .= "    const $item = $(this).attr('data-$item');\n";
+    $retval .= "    const $item = $(this).attr('data-key');\n";
 
     $rule = get_row_label_id('print_js');
 

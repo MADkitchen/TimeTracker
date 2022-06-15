@@ -44,7 +44,7 @@ defined('ABSPATH') || exit;
         let data = {};
         jQuery('input[name^="' + select_identifier + '"]:checked').each(function () {
             let x = jQuery(this).attr('name').replace(select_identifier, '');
-            let y = jQuery(this).val();
+            let y = jQuery(this).data("key");
             if (x in data) {
                 data[x].push(y);
             } else {

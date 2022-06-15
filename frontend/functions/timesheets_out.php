@@ -27,13 +27,13 @@ foreach ($ajax_functions as $item) {
     add_action('wp_ajax_nopriv_' . $item, $item);
 }
 
-function populate_selectors($filter = [], $date_range = []) {
+function populate_selectors($filtered_query = [], $original_query = [], $date_range = []) {
 
     if (!$date_range) {
         $date_range = get_filter_date_range();
     }
 
-    $data = get_selectors_data($filter, $date_range);
+    $data = get_selectors_data($filtered_query, $date_range);
 
     $button_wrapper = '<div style="position:relative">'
             . '<div name="reset" class="w3-button w3-red w3-display-topleft"%1$s>&#9745;</div>'
@@ -42,17 +42,18 @@ function populate_selectors($filter = [], $date_range = []) {
 
     //Populate elements inner except date range
     $html = [];
-    foreach ($data as $key => $item) {
+    foreach ($data as $column => $entries) {
         $inner = '';
-        $is_filtered = array_key_exists($key, $filter);
-        $is_alone = count($item) == 1;
-        foreach ($item as $value) {
-            $checked = $is_filtered && in_array($value, $filter[$key]);
+        $is_filtered = array_key_exists($column, $original_query);
+        $is_alone = count($entries) == 1;
+        foreach ($entries as $entry) {
+            $value=$entry->table=='timetable'?$entry->value:$entry->key; //TODO: improve last parameter logic (main tableitems)
+            $checked = $is_filtered && in_array($value, $original_query[$column]);
             $disabled = $is_alone && !$checked;
-            $inner .= sprintf('<input name="tsr_select_%2$s" type="checkbox" value="%1$s"' . checked($checked, true, false) . disabled($disabled, true, false) . '> <label>%1$s</label><br>', $value, $key);
+            $inner .= sprintf('<input name="tsr_select_%2$s" type="checkbox" value="%1$s" data-key="%3$s"' . checked($checked, true, false) . disabled($disabled, true, false) . '> <label>%1$s</label><br>', get_label($data, $entry, $column), $column, $value);
         }
-        $html[$key] = '<div id="tsr_select_' . $key . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
-                . ts_get_column_prop($key, 'description')
+        $html[$column] = '<div id="tsr_select_' . $column . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
+                . ts_get_column_prop($column, 'description')
                 . '</div><div name="block" style="display:none" class="w3-border w3-border-red w3-hover-border-gray w3-padding">' . $inner . '</div>';
     }
     $html = array_map(function ($a) use ($button_wrapper) {
@@ -88,8 +89,8 @@ function populate_selectors($filter = [], $date_range = []) {
     $col_html = '<div class="w3-cell w3-third">%s</div>';
     $col = '';
     $count = 0;
-    foreach ($html as $item) {
-        $col .= $item;
+    foreach ($html as $chunk) {
+        $col .= $chunk;
         $count++;
         if ($count == $items_per_column) {
             $output .= sprintf($col_html, $col);
@@ -105,6 +106,7 @@ function populate_selectors($filter = [], $date_range = []) {
 
     return $output;
 }
+
 
 function get_report_vars() {
     return [
@@ -164,31 +166,11 @@ function get_filter_date_range(&$filter = []) {
 
 function get_selectors_data($filter = [], $date_range = []) {
 
-    $data_cols = ts_get_column_prop(get_report_vars());
+    $data_cols = get_report_vars();
 
-    //$date_range = get_filter_date_range($filter);
+    $query = array_merge($filter, isset($date_range['query']) ? $date_range['query'] : []);
 
-    $data_tot = [];
-    foreach ($data_cols as $a) {
-
-        $default_args = [
-            'count' => true,
-            'groupby' => [
-                $a,
-            ]
-        ];
-
-        $x = ts_query_items(
-                array_merge($default_args, $filter, isset($date_range['query']) ? $date_range['query'] : []),
-        );
-
-        $data_tot[$a] = [];
-        foreach ($x as $item) {
-            $data_tot[$a][] = ts_resolve_relation($a, $item[$a]);
-        }
-    }
-
-    return $data_tot;
+    return filter_args_out($data_cols, $query);
 }
 
 function ajax_build_report() {
@@ -198,13 +180,14 @@ function ajax_build_report() {
         $z = $_POST['data_out'];
         $y = json_decode(html_entity_decode(stripslashes($z)), true);
         if ($y) {
-            $filters = ts_get_column_prop(get_report_vars(), 'name', $y);
+            $original_query = ts_get_column_prop(get_report_vars(), 'name', $y);
+            $filtered_query = filter_args_in($original_query);
             $date_range = get_filter_date_range($y);
         }
     }
 
-    $w['selectors'] = populate_selectors($filters, $date_range);
-    $w['chartsdata'][] = chart1_get_data($filters, $date_range);
+    $w['selectors'] = populate_selectors($filtered_query ?? [], $original_query ?? [], $date_range ?? []);
+    $w['chartsdata'][] = chart1_get_data($filtered_query ?? [], $date_range ?? []);
 
     $v = json_encode($w);
 
@@ -234,7 +217,7 @@ function chart1_get_data($args = [], $date_range = []) {
     $w = [];
     foreach ($x as $z) {
         foreach ($z as $key => $value) {
-            $w[$key][] = ts_resolve_relation($key, $value);
+            $w[$key][] = $value; //ts_resolve_relation($key, $value);
         }
     }
 
