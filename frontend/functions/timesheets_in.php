@@ -60,7 +60,6 @@ function build_table($year = null, $week = null) {
 
     $x = ts_query_items([
         'user_name' => $current_user->user_login,
-        //'number' => SUM_LIMIT_TRIGGER,
         'sum' => [
             'time_units'
         ],
@@ -213,6 +212,14 @@ function build_row($data, $values = array()) {
     $labels = ts_get_column_prop(get_timesheet_vars());
     $row_id = get_row_label_id($data);
 
+    $retval = sprintf('<tr id="ts_row_%1$s" data-%2$s="%3$s" data-%4$s="%5$s">',
+            $row_id,
+            $labels['job_tag'],
+            $data[$labels['job_tag']],
+            $labels['activity_id'],
+            $data[$labels['activity_id']],
+    );
+
     //Resolve
     if (!empty($data['job_tag'])) {
         $data['job_no'] = ts_get_column_value_by_id('job_no', $data['job_no']);
@@ -224,19 +231,6 @@ function build_row($data, $values = array()) {
         $data['activity_id_name'] = ts_get_column_value_by_id('activity_id_name', $data['activity_id_name']);
         $data['activity_id'] = ts_get_column_value_by_id('activity_id', $data['activity_id']);
     }
-
-
-    $retval = sprintf('<tr id="ts_row_%1$s" data-%2$s="%3$s" data-%4$s="%5$s" data-%6$s="%7$s" data-%8$s="%9$s">',
-            $row_id,
-            $labels['job_no'],
-            $data[$labels['job_no']],
-            $labels['job_wbs'],
-            $data[$labels['job_wbs']],
-            $labels['job_tag'],
-            $data[$labels['job_tag']],
-            $labels['activity_id'],
-            $data[$labels['activity_id']],
-    );
 
     $retval .= '<td class="w3-center">';
     $retval .= '<div class="w3-row-padding w3-center">';
@@ -298,11 +292,11 @@ function ajax_send_to_db() {
 
         if (isset($_POST['key']) && $_POST['key']) {
             if ($_POST['time_units']) {
-                if (ts_update_items($_POST['key'], ['time_units' => $_POST['time_units'],])) {
+                if (ts_update_item($_POST['key'], ['time_units' => $_POST['time_units'],])) {
                     $retval = $_POST['key'];
                 }
             } else {
-                if (ts_delete_items($_POST['key'])) {
+                if (ts_remove_item($_POST['key'])) {
                     $retval = '';
                 }
             }
@@ -311,14 +305,11 @@ function ajax_send_to_db() {
             $retval = ts_add_items([
                 'activity_id' => $_POST['activity_id'],
                 'date_rec' => $_POST['date_rec'],
-                //'activity_group' => ts_get_activity_group($_POST['activity_id']),
                 'user_group' => 'y', //TODO: add wp option
-                //'job_no' => $_POST['job_no'],
-                //'job_tag' => $_POST['job_tag'],
                 'time_units' => $_POST['time_units'],
                 'user_name' => $current_user->user_login, //TODO: check if better $current_user->display_name
                 'user_role' => 'x', //TODO: add wp option
-                'job_wbs' => $_POST['job_wbs'],
+                'job_tag' => $_POST['job_tag'],
             ]);
         }
     }

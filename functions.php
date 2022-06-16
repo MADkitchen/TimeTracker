@@ -33,8 +33,12 @@ function ts_query_items($arg = [], $table = 'timetable') { //TODO:disable LIMIT=
     return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, $arg)->items;
 }
 
-function ts_update_items($arg, $table = 'timetable') {
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table)->update_item($arg);
+function ts_update_item($key, $arg, $table = 'timetable') {
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table)->update_item($key, $arg);
+}
+
+function ts_remove_item($key, $table = 'timetable') {
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table)->delete_item($key);
 }
 
 function ts_add_items($arg, $table = 'timetable') {
@@ -80,9 +84,8 @@ function ts_get_id_by_column_value($column, $value, $get_row = false) {
     }
 }
 
-function ts_is_timetable_source($column) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
-    return $entry->get_source_table($column) === 'timetable';
+function ts_is_lookup_table($table) {
+    return !empty(MADkitchen\Database\Handler::get_tables_data('TimeTracker', $table)['lookup_table']);
 }
 
 function ts_get_table_source($column) {
@@ -122,7 +125,7 @@ function ts_get_activities() {
     return $retval;
 }
 
-function filter_args_out($data_cols, $query) {
+function filter_args_out($data_cols, $query = [], $base_table = null) {
     $data_cols = array_values($data_cols); //TODO: check if associative arrays are really needed upstream
     $data_buffer = $data_cols;
     $data_tot = [];
@@ -139,7 +142,7 @@ function filter_args_out($data_cols, $query) {
                 $default_args = [
                     //'count' => true,
                     'groupby' => [
-                        'id', //TODO: generalize 'id'
+                        ts_is_lookup_table($base_table ?? ts_get_table_source($a)) ? 'id' : $a, //TODO: generalize 'id'
                     ],
                     'orderby' => [
                         $a,
@@ -149,11 +152,12 @@ function filter_args_out($data_cols, $query) {
 
                 $x = ts_query_items(
                         array_merge($default_args, $query),
+                        $base_table ?? ts_get_table_source($a),
                 );
 
                 $data_tot[$a] = [];
                 foreach ($x as $item) {
-                    if (ts_is_timetable_source($a)) { //will not be used eventually...
+                    if (ts_get_table_source($a) === ($base_table ?? ts_get_table_source($a))) { //will not be used eventually...
                         $data_tot[$a][] = ts_get_entry_by_row($a, $item);
                     } else {
                         $data_tot[$a][] = ts_get_entry_by_id($a, $item->$a);
@@ -230,16 +234,24 @@ function filter_args_in($args) {
     return $args; //check
 }
 
-function ts_add_external_columns_to_query_res($external_columns, $ref_columns, &$ref_query_res) {
+function ts_add_external_columns_to_query_res($external_columns, $ref_columns, &$ref_query_res, $base_table = null) {
 
-    $query = [];
+    $queries = [];
     foreach ($ref_columns as $column) {
         if (!empty($ref_query_res[$column])) {
-            $query[$column] = $ref_query_res[$column];
+            $queries[$column] = $ref_query_res[$column];
         }
     }
 
-    $extra_entries = filter_args_out(array_merge($external_columns, $ref_columns), $query);
+    $extra_entries = [];
+    if (empty($base_table)) {
+
+        foreach ($queries as $key => $query) {
+            $extra_entries = array_merge($extra_entries, filter_args_out(array_merge($external_columns, $ref_columns), ['id' => $query])); //TODO: generalize 'id'
+        }
+    } else {
+        $extra_entries = filter_args_out(array_merge($external_columns, $ref_columns), $queries, 'timetable');
+    }
 
     foreach ($extra_entries as $key => $entry) {
         if (in_array($key, $external_columns)) {
