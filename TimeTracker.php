@@ -135,16 +135,12 @@ class TimeTracker extends \MADkitchen\Modules\Module {
     ];
     protected $pages_data = [
         [
-            'title' => 'Timesheets',
-            'slug' => 'timesheets',
+            'title' => 'Timetable',
+            'slug' => 'tt/timetable',
         ],
         [
-            'title' => 'Timesheet IN',
-            'slug' => 'timesheets/in',
-        ],
-        [
-            'title' => 'Timesheet OUT',
-            'slug' => 'timesheets/out',
+            'title' => 'Dashboard',
+            'slug' => 'tt/dashboard',
         ],
     ];
 
