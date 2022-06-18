@@ -155,7 +155,7 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 \MADkitchen\Database\Handler::get_std_lookup_table('job_tag', "Job tag", [['tag' => 'job_wbs']]),
                 \MADkitchen\Database\Handler::get_std_lookup_table('user_group', "Group of user"),
                 \MADkitchen\Database\Handler::get_std_lookup_table('user_role', "Role of users"),
-                \MADkitchen\Database\Handler::get_std_lookup_table('user_name', "Users",[['tag' => 'user_role'],['tag' => 'user_group'],['tag' => 'wp_id']]),
+                \MADkitchen\Database\Handler::get_std_lookup_table('user_name', "Users", [['tag' => 'user_role'], ['tag' => 'user_group'], ['tag' => 'wp_id']]),
         );
 
         parent::__construct();

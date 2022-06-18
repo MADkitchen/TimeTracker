@@ -55,11 +55,15 @@ function build_header($year = null, $week = null) {
 }
 
 function build_table($year = null, $week = null) {
-    global $current_user;
     $days = MADkitchen\Helpers\Time::get_days($year, $week);
 
+    $user = ts_get_current_user();
+    if (empty($user)) {
+        return;
+    }
+
     $x = ts_query_items([
-        'user_name' => $current_user->user_login,
+        'user_name' => $user->id, //TODO: generalize 'id'
         'sum' => [
             'time_units'
         ],
@@ -282,8 +286,6 @@ function fill_activitylist() {
 function ajax_send_to_db() {
 //TODO: improve sanitization
 
-    global $current_user;
-
     if (isset($_POST['date_rec']) &&
             isset($_POST['activity_id']) &&
             isset($_POST['job_tag'])) {
@@ -302,15 +304,20 @@ function ajax_send_to_db() {
             }
         } else {
 
-            $retval = ts_add_items([
-                'activity_id' => $_POST['activity_id'],
-                'date_rec' => $_POST['date_rec'],
-                'user_group' => 'y', //TODO: add wp option
-                'time_units' => $_POST['time_units'],
-                'user_name' => $current_user->user_login, //TODO: check if better $current_user->display_name
-                'user_role' => 'x', //TODO: add wp option
-                'job_tag' => $_POST['job_tag'],
-            ]);
+            //TODO: implement role/group per job and fallback to default specified in username table if needed
+            $user = ts_get_current_user();
+            if (!empty($user)) {
+
+                $retval = ts_add_items([
+                    'activity_id' => $_POST['activity_id'],
+                    'date_rec' => $_POST['date_rec'],
+                    'user_group' => $user->user_group,
+                    'time_units' => $_POST['time_units'],
+                    'user_name' => $user->id, //TODO: generalize 'id'
+                    'user_role' => $user->user_role,
+                    'job_tag' => $_POST['job_tag'],
+                ]);
+            }
         }
     }
 

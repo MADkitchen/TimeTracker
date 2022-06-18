@@ -286,3 +286,9 @@ function get_label($dataset_entries, $this_entry, $this_column) {
 
     return join(" ", $retval);
 }
+
+function ts_get_current_user() {
+    global $current_user;
+
+    return reset(ts_query_items($arg = ['wp_id' => [$current_user->id]], 'user_name')) ?? null;
+}
