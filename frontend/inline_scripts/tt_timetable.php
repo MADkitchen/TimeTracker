@@ -70,7 +70,7 @@ defined('ABSPATH') || exit;
         let year = jQuery("#ts_table_year").val();
         let week = jQuery("#ts_table_week").val();
         y = jQuery('#ts_header_select');
-        y.html(get_spinner('w3-text-white w3-jumbo'));
+        y.html(get_spinner('w3-text-white mk-jumbo'));
         jQuery.ajax({
             type: 'POST',
             data: {action: 'ajax_build_timesheet',

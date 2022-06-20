@@ -30,7 +30,7 @@ foreach ($ajax_functions as $item) {
 function build_header($year = null, $week = null) {
 
     $retval_th = '<th id="ts_header_select" style="width:30%%; padding:0">%s</th>';
-    $retval_select = '<select id="ts_table_%1$s" name="ts_table_%1$s" class="w3-button w3-ripple w3-large w3-block" style="padding:0; margin:0">%2$s</select>';
+    $retval_select = '<select id="ts_table_%1$s" name="ts_table_%1$s" class="w3-button w3-ripple mk-large w3-block" style="padding:0; margin:0">%2$s</select>';
     $retval_option = '<option value="%1$s" %2$s>%3$s</option>';
 
     $retval1 = '';
@@ -46,8 +46,8 @@ function build_header($year = null, $week = null) {
 
     foreach (MADkitchen\Helpers\Time::get_days($year, $week) as $no => $item) {
         $buffer .= '<th id="ts_weekday_' . $no . '" data-date="' . $item['date'] . '" class="w3-padding-16" style="width:10%">';
-        $buffer .= '<div class="w3-block">' . $item['name'] . '</div>';
-        $buffer .= '<div class="w3-block w3-large">' . $item['number'] . '</div>';
+        $buffer .= '<div class="w3-block mk-medium">' . $item['name'] . '</div>';
+        $buffer .= '<div class="w3-block mk-large">' . $item['number'] . '</div>';
         $buffer .= '</th>';
     }
 
@@ -238,11 +238,11 @@ function build_row($data, $values = array()) {
 
     $retval .= '<td class="w3-center">';
     $retval .= '<div class="w3-row-padding w3-center">';
-    $retval .= '<div class="w3-third">' . $data[$labels['job_no']] . '</div>';
-    $retval .= '<div class="w3-third">' . $data[$labels['job_wbs']] . '</div>';
-    $retval .= '<div class="w3-third">' . $data[$labels['job_tag']] . '</div>';
+    $retval .= '<div class="w3-third mk-medium">' . $data[$labels['job_no']] . '</div>';
+    $retval .= '<div class="w3-third mk-medium">' . $data[$labels['job_wbs']] . '</div>';
+    $retval .= '<div class="w3-third mk-medium">' . $data[$labels['job_tag']] . '</div>';
     $retval .= '</div>';
-    $retval .= '<div class="w3-block w3-padding-16 w3-large">' . $data[$labels['activity_id']] . ' - ' . $data[$labels['activity_id_name']] . '</div>';
+    $retval .= '<div class="w3-block w3-padding-16 mk-large">' . $data[$labels['activity_id']] . ' - ' . $data[$labels['activity_id_name']] . '</div>';
     $retval .= '</td>';
 
     for ($i = 0;
@@ -250,7 +250,7 @@ function build_row($data, $values = array()) {
             $i++) {
         $key = isset($values[$i]) ? $values[$i]['key'] : '';
         $value = isset($values[$i]) ? $values[$i]['value'] : '';
-        $retval .= '<td name="ts_' . $i . '_entry" data-day="' . $i . '" data-key="' . $key . '" class="w3-button w3-center w3-xlarge" style="vertical-align: middle;">' . $value . '</td>';
+        $retval .= '<td name="ts_' . $i . '_entry" data-day="' . $i . '" data-key="' . $key . '" class="w3-button mk-xlarge mk-cell">' . $value . '</td>';
     }
 
     $retval .= '</tr>';
@@ -269,13 +269,13 @@ function fill_activitylist() {
     $retval = '';
 
     foreach ($lookup_activities as $key => $value) {
-        $retval .= "<div onclick=\"jQuery('#ts_modal-$key-block').toggleClass('w3-hide')\" class=\"w3-button w3-large w3-block w3-left-align w3-red\" id=\"ts_modal-$key-group\">$key - " . $lookup_activities[$key]['name'] . "</div>";
+        $retval .= "<div onclick=\"jQuery('#ts_modal-$key-block').toggleClass('w3-hide')\" class=\"w3-button mk-large w3-block w3-left-align w3-red\" id=\"ts_modal-$key-group\">$key - " . $lookup_activities[$key]['name'] . "</div>";
         $retval .= "<div id=\"ts_modal-$key-block\" class=\"w3-container w3-hide\">";
         foreach ($value as $subkey => $subvalue) {
             if ($subkey == 'name') {
                 continue;
             }
-            $retval .= "<div class=\"w3-button w3-block w3-large w3-left-align\" id=\"ts_modal-item\" data-key=\"$subkey\">{$subvalue['no']} - {$subvalue['name']}</div>";
+            $retval .= "<div class=\"w3-button w3-block mk-large w3-left-align\" id=\"ts_modal-item\" data-key=\"$subkey\">{$subvalue['no']} - {$subvalue['name']}</div>";
         }
         $retval .= '</div>';
     }
@@ -372,7 +372,7 @@ function js_build_activity_click() {
 
     $retval .= "    const id_no = $rule;\n"
             . "        if (!$('#ts_row_' + id_no).length) {\n"
-            . "            y.html(get_spinner('w3-text-white w3-jumbo'));\n"
+            . "            y.html(get_spinner('w3-text-white mk-jumbo'));\n"
             . "            $.ajax({\n"
             . "                type: 'POST',\n"
             . "                data: {action: 'ajax_build_row',\n";
@@ -415,7 +415,7 @@ function js_build_update_entry() {
     $rule = get_row_label_id('print_js');
     $retval .= "        const id_no = $rule;\n"
             . "        let y = jQuery('#ts_row_' + id_no + ' [data-day=\"' + day + '\"]');\n"
-            . "        y.html(get_spinner('w3-text-red w3-jumbo'));\n"
+            . "        y.html(get_spinner('w3-text-red mk-jumbo'));\n"
             . "        jQuery.ajax({\n"
             . "            type: 'POST',\n"
             . "            data: {action: 'ajax_send_to_db',\n";
