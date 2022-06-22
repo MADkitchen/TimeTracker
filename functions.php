@@ -295,3 +295,101 @@ function ts_get_current_user() {
 
     return reset(ts_query_items(['wp_id' => [$current_user->id]], 'user_name')) ?? null;
 }
+
+//$hierarchy is an array of items hierarchically linked and ordered from top to bottom, at caller's responsibility
+
+function ts_get_hierarchical_structure($hierarchy) {
+    $retval = [];
+    $x = ts_query_items([
+        'groupby' => [
+            $hierarchy
+        ],
+            ], ts_get_table_source(end($hierarchy))
+    );
+
+    $hierarchy = array_reverse($hierarchy);
+
+    foreach ($x as $x_row) {
+
+        $levels = [];
+        $item_tag = reset($hierarchy);
+//TODO: generalize 'id'
+        do {
+            $levels[$item_tag] = !empty($prev_tag) ? ts_get_column_value_by_id($item_tag, $levels[$prev_tag]->$item_tag, true) : $x_row;
+            if (empty($prev_tag)) {
+                $retval[$item_tag]['ids'][$levels[$item_tag]->id] = [];
+                $retval[$item_tag]['count'][$levels[$item_tag]->id] = 1;
+            } else {
+                $retval[$item_tag]['ids'][$levels[$item_tag]->id][$levels[$prev_tag]->id] = $retval[$prev_tag]['ids'][$levels[$prev_tag]->id];
+                $retval[$item_tag]['count'][$levels[$item_tag]->id] = ($retval[$item_tag]['count'][$levels[$item_tag]->id] ?? 0) + $retval[$prev_tag]['count'][$levels[$prev_tag]->id];
+            }
+            //$retval[$item_tag]['count'][$levels[$item_tag]->id]--; //table is assumed aligned hence row is shared between columns
+            $retval[$item_tag]['rows'][$levels[$item_tag]->id] = $levels[$item_tag];
+
+            $prev_tag = $item_tag;
+        } while (($item_tag = next($hierarchy)) !== false);
+
+        unset($prev_tag);
+    }
+
+    return ['data' => array_reverse($retval), 'count' => count($x)];
+}
+
+function ts_get_table_inner_by_hierarchical_structure($hierarchical_structure) {
+    $table_row = '<tr class="w3-center">%s</tr>';
+    $table_cell = '<td rowspan="%1$s" class="w3-button mk-cell w3-padding-16" data-key="%3$s" data-type="%4$s">%2$s</td>';
+    $cells = [];
+    $this_span = 0;
+    $list = array_keys($hierarchical_structure['data']);
+    foreach ($list as $item) {
+        reset($hierarchical_structure['data'][$item]['count']);
+        for ($i = 0; $i < $hierarchical_structure['count']; $i++) {
+            if (!$this_span) {
+                $this_span = current($hierarchical_structure['data'][$item]['count']);
+                $this_key = key($hierarchical_structure['data'][$item]['count']);
+                $this_value = $hierarchical_structure['data'][$item]['rows'][$this_key]->$item . ' - ' . $hierarchical_structure['data'][$item]['rows'][$this_key]->{"{$item}_name"};
+                $cells[$item][$i] = sprintf($table_cell, $this_span, $this_value, $this_key, $item);
+                next($hierarchical_structure['data'][$item]['count']);
+            } else {
+                $cells[$item][$i] = '';
+            }
+            $this_span--;
+        }
+    }
+    $table_inner = '';
+    for ($i = 0; $i < $hierarchical_structure['count']; $i++) {
+        $row_inner = '';
+        foreach ($list as $item) {
+            $row_inner .= $cells[$item][$i];
+        }
+        $table_inner .= sprintf($table_row, $row_inner);
+    }
+
+    return $table_inner;
+}
+
+function ts_build_hierarchical_table(array $ordered_list) {
+
+    $table = '<table class="w3-table-all w3-card w3-center mk-medium">%s</table>';
+
+    $header_row = '<tr class="w3-red">%s</tr>';
+    $footer_row = '<tr class="mk-xlarge">%s</tr>';
+    $header_cell = '<th class="mk-large w3-padding-16 w3-center">%1$s</th>';
+    $footer_cell = '<td class="w3-button w3-red w3-ripple w3-block w3-center">%1$s</td>';
+
+    $column_titles = array_map(fn($a) => sprintf($header_cell, $a),
+            array_map(fn($a) => ts_get_column_prop($a, 'description'), $ordered_list)
+    );
+    $retval = sprintf($header_row, join('', $column_titles));
+
+    $retval .= ts_get_table_inner_by_hierarchical_structure(ts_get_hierarchical_structure($ordered_list));
+
+    $btm_buttons = array_map(fn($a) => sprintf($footer_cell, $a),
+            array_map(fn($a) => '&plus;', $ordered_list),
+            []
+    );
+
+    $retval .= sprintf($footer_row, join('', $btm_buttons));
+
+    echo sprintf($table, $retval);
+}
