@@ -151,7 +151,7 @@ function build_subtotals_row($subtotals = array()) {
 function build_last_row($total = 0) {
 
     $retval = '<td id="ts_table_new" class="w3-xlarge" style="padding:0">';
-    $retval .= '<div onclick="filter(); jQuery(\'#ts_modal_newrow\').show()" class="w3-button w3-red w3-ripple w3-block">&plus;</div>';
+    $retval .= '<div onclick="'.get_one_word_find_args().' jQuery(\'#ts_modal_search\').val(\'\'); jQuery(\'#ts_modal_newrow\').show();" class="w3-button w3-red w3-ripple w3-block">&plus;</div>';
     $retval .= '</td>';
     for ($i = 0;
             $i < 5;
@@ -269,8 +269,8 @@ function fill_activitylist() {
     $retval = '';
 
     foreach ($lookup_activities as $key => $value) {
-        $retval .= "<div onclick=\"jQuery('#ts_modal-$key-block').toggleClass('w3-hide')\" class=\"w3-button mk-large w3-block w3-left-align w3-red\" id=\"ts_modal-$key-group\">$key - " . $lookup_activities[$key]['name'] . "</div>";
-        $retval .= "<div id=\"ts_modal-$key-block\" class=\"w3-container w3-hide\">";
+        $retval .= "<div onclick=\"jQuery('#ts_modal-$key-block').toggle()\" class=\"w3-button mk-large w3-block w3-left-align w3-red\" id=\"ts_modal-$key-group\">$key - " . $lookup_activities[$key]['name'] . "</div>";
+        $retval .= "<div id=\"ts_modal-$key-block\" class=\"w3-container\" style:\"display:none\">";
         foreach ($value as $subkey => $subvalue) {
             if ($subkey == 'name') {
                 continue;
@@ -474,4 +474,8 @@ function js_build_table_changed() {
             . "    }\n";
 
     echo $retval;
+}
+
+function get_one_word_find_args($val="''"){
+    return htmlspecialchars("one_word_find($val,'[id$=\"item\"]','[id$=\"group\"]','[id$=\"block\"]');");
 }

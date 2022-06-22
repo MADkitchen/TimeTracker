@@ -28,7 +28,7 @@ defined('ABSPATH') || exit;
                 <select id="ts_modal_select_job_tag" name="ts_modal_select_job_tag" class="w3-button w3-ripple w3-block mk-large w3-padding-8" style="padding:0; margin:0">
                     <?php get_job_tags() ?>
                 </select>
-            </div><div><input type="search" placeholder="Search.." id="ts_modal_search" onkeyup="filter(jQuery(this).val())" class="w3-white w3-input" style="background-image: url('<?php
+            </div><div><input type="search" placeholder="Search.." id="ts_modal_search" onkeyup="<?php  echo get_one_word_find_args('jQuery(this).val()') ?>" class="w3-white w3-input" style="background-image: url('<?php
                 global $mk_plugin_url; //TODO: cleanup
                 echo $mk_plugin_url . join('/', array('assets', 'images', 'searchicon.png'));
                 ?>'); background-position: 14px 12px; background-repeat: no-repeat; padding: 14px 20px 12px 45px;"></div>

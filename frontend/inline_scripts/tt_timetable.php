@@ -88,21 +88,6 @@ defined('ABSPATH') || exit;
         });
     }
 
-    function filter(x = '') {
-
-        if (x !== '') {
-            jQuery('[id$="group"]').hide();
-            jQuery('[id$="block"]').removeClass('w3-hide');
-            jQuery('[id$="item"]').hide();
-            jQuery("[id$=item]:icontains(" + x + ")").show();
-        } else {
-            jQuery('[id$="group"]').show();
-            jQuery('[id$="block"]').addClass('w3-hide');
-            jQuery('[id$="item"]').show();
-            jQuery('#ts_modal_search').val('');
-    }
-    }
-
     function get_spinner(extra_classes = '') {
         return '<div class="w3-center w3-spin ' + extra_classes + '">&ring;</div>';
     }
