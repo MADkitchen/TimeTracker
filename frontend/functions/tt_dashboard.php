@@ -54,7 +54,7 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
         }
         $html[$column] = '<div id="tsr_select_' . $column . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
                 . ts_get_column_prop($column, 'description')
-                . '</div><div name="block" style="display:none" class="w3-border w3-border-red w3-hover-border-gray w3-padding">' . $inner . '</div>';
+                . '</div><div name="block" style="display:none" class="w3-padding w3-white">' . $inner . '</div>';
     }
     $html = array_map(function ($a) use ($button_wrapper) {
         $display = str_contains($a, checked(true, true, false)) ? '' : ' style="display:none"';
@@ -75,7 +75,7 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
     }
 
     $html['date_range'] = '<div id="tsr_select_range" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">' . __('Date range') . '</div>'
-            . '<div name="block" style="display:none" class="w3-border w3-border-red w3-hover-border-gray w3-padding">'
+            . '<div name="block" style="display:none" class="w3-padding w3-white">'
             . '<input type="date" id="after" value="' . $after . '" min="' . $min . '" max="' . $max . '"> <label>' . __('After') . '</label><br>'
             . '<input type="date" id="before" value="' . $before . '" min="' . $min . '" max="' . $max . '"> <label>' . __('Before') . '</label><br>'
             . '</div>';
