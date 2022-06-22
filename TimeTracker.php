@@ -142,6 +142,14 @@ class TimeTracker extends \MADkitchen\Modules\Module {
             'title' => 'Dashboard',
             'slug' => 'tt/dashboard',
         ],
+        [
+            'title' => 'Jobs setup',
+            'slug' => 'tt/jobs',
+        ],
+                [
+            'title' => 'Activities setup',
+            'slug' => 'tt/activities',
+        ],
     ];
 
     public function __construct() {
