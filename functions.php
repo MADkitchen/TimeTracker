@@ -30,7 +30,10 @@ function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_t
 }
 
 function ts_query_items($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, $arg)->items;
+    $defaults=[
+        'order'=>'ASC'
+    ];
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, array_merge($defaults,$arg))->items;
 }
 
 function ts_update_item($key, $arg, $table = 'timetable') {
