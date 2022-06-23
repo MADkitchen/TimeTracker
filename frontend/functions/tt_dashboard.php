@@ -27,7 +27,7 @@ foreach ($ajax_functions as $item) {
     add_action('wp_ajax_nopriv_' . $item, $item);
 }
 
-function populate_selectors($filtered_query = [], $original_query = [], $date_range = []) {
+function populate_selectors($filtered_query = [], $original_query = [], $date_range = [], $current_group = '') {
 
     if (!$date_range) {
         $date_range = get_filter_date_range();
@@ -52,9 +52,10 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
             $disabled = $is_alone && !$checked;
             $inner .= sprintf('<input name="tsr_select_%2$s" type="checkbox" value="%1$s" data-key="%3$s"' . checked($checked, true, false) . disabled($disabled, true, false) . '> <label>%1$s</label><br>', get_label($data, $entry, $column), $column, $value);
         }
+        $show_column = $current_group !== $column ? "display:none" : "";
         $html[$column] = '<div id="tsr_select_' . $column . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
                 . ts_get_column_prop($column, 'description')
-                . '</div><div name="block" style="display:none" class="w3-padding w3-white">' . $inner . '</div>';
+                . '</div><div name="block" style="' . $show_column . '" class="w3-padding w3-white">' . $inner . '</div>';
     }
     $html = array_map(function ($a) use ($button_wrapper) {
         $display = str_contains($a, checked(true, true, false)) ? '' : ' style="display:none"';
@@ -73,11 +74,11 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
         $after = isset($date_range['range']['after']) ? $date_range['range']['after'] : $date_range['range']['min'];
         $before = isset($date_range['range']['before']) ? $date_range['range']['before'] : $date_range['range']['max'];
     }
-
+    $show_column = $current_group !== 'range' ? "display:none" : "";
     $html['date_range'] = '<div id="tsr_select_range" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">' . __('Date range') . '</div>'
-            . '<div name="block" style="display:none" class="w3-padding w3-white">'
-            . '<input type="date" id="after" value="' . $after . '" min="' . $min . '" max="' . $max . '"> <label>' . __('After') . '</label><br>'
-            . '<input type="date" id="before" value="' . $before . '" min="' . $min . '" max="' . $max . '"> <label>' . __('Before') . '</label><br>'
+            . '<div name="block" style="' . $show_column . '" class="w3-padding w3-white">'
+            . '<input name="tsr_select_range" type="date" id="after" value="' . $after . '" min="' . $min . '" max="' . $max . '"> <label>' . __('After') . '</label><br>'
+            . '<input name="tsr_select_range" type="date" id="before" value="' . $before . '" min="' . $min . '" max="' . $max . '"> <label>' . __('Before') . '</label><br>'
             . '</div>';
     $display = ($before !== $max) || ($after !== $min) ? '' : ' style="display:none"';
     $html['date_range'] = sprintf($button_wrapper, $display, $html['date_range']);
@@ -185,7 +186,7 @@ function ajax_build_report() {
         }
     }
 
-    $w['selectors'] = populate_selectors($filtered_query ?? [], $original_query ?? [], $date_range ?? []);
+    $w['selectors'] = populate_selectors($filtered_query ?? [], $original_query ?? [], $date_range ?? [], $_POST['current_group']);
     $w['chartsdata'][] = chart1_get_data($filtered_query ?? [], $date_range ?? []);
 
     $v = json_encode($w);

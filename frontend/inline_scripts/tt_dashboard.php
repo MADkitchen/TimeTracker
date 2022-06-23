@@ -51,6 +51,7 @@ defined('ABSPATH') || exit;
                 data[x] = [y];
             }
         });
+        let w = typeof xhrObj.lastclickedobj ? xhrObj.lastclickedobj.replace(select_identifier, '') : '';
 
         let a = jQuery('#after');
         let b = jQuery('#before');
@@ -63,7 +64,7 @@ defined('ABSPATH') || exit;
 
         xhrObj.ajaxobject = jQuery.ajax({
             type: 'POST',
-            data: {action: 'ajax_build_report', data_out: z},
+            data: {action: 'ajax_build_report', data_out: z, current_group: w},
             dataType: 'json',
             url: '<?php echo admin_url('admin-ajax.php') ?>',
             success: function (data) {
@@ -72,8 +73,8 @@ defined('ABSPATH') || exit;
                 xhrObj.chartobjects[0] = build_graph(data.chartsdata[0]);
             },
             error: function (textStatus, errorThrown, jqXHR) {
-                console.log('textStatus');
-                console.log(textStatus);
+                //console.log('textStatus');
+                //console.log(textStatus);
             }
         });
     }
@@ -119,7 +120,7 @@ defined('ABSPATH') || exit;
         });
     }
 
-    function refresh_report() {
+    function refresh_report(e) {
 
         xhrQueue.push(xhrCount);
         setTimeout(function () {
@@ -135,7 +136,8 @@ defined('ABSPATH') || exit;
                 });
                 xhrObj = {
                     ajaxobject: null,
-                    chartobjects: [null]
+                    chartobjects: [null],
+                    lastclickedobj: e ? e.target.name : ''
                 };
 
                 request_data(xhrObj);
