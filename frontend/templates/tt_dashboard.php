@@ -32,7 +32,7 @@ defined('ABSPATH') || exit;
     </div>
 </div>
 
-<div id="tsr_selectors_open_modal" onclick="jQuery('#ts_modal_selectors').show();" class="w3-button w3-red w3-ripple w3-block w3-xlarge">&plus;</div>
+<div id="tsr_selectors_open_modal" class="w3-ripple w3-block w3-xlarge"></div>
 
 <div class="chart-container" style="position: relative;  margin: auto;  width: 100%;">
     <canvas id="myChart"></canvas>

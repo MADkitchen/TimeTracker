@@ -52,15 +52,15 @@ defined('ABSPATH') || exit;
             }
         });
         let w = typeof xhrObj.lastclickedobj ? xhrObj.lastclickedobj.replace(select_identifier, '') : '';
-
         let a = jQuery('#after');
         let b = jQuery('#before');
         if (a.val() !== a.prop('min'))
             data['after'] = a.val();
         if (b.val() !== b.prop('max'))
             data['before'] = b.val();
-
         let z = JSON.stringify(data);
+
+        toggle_open_modal(false);
 
         xhrObj.ajaxobject = jQuery.ajax({
             type: 'POST',
@@ -70,6 +70,7 @@ defined('ABSPATH') || exit;
             success: function (data) {
                 jQuery('#tsr_selectors').html(data.selectors);
                 update_selects();
+                toggle_open_modal();
                 xhrObj.chartobjects[0] = build_graph(data.chartsdata[0]);
                 xhrObj.chartobjects[1] = build_graph2(data.chartsdata[1]);
             },
@@ -133,6 +134,21 @@ defined('ABSPATH') || exit;
         return [
             x
         ];
+    }
+
+    function toggle_open_modal(show = true) {
+        const x = jQuery('#tsr_selectors_open_modal');
+        if (show === true) {
+            x.addClass(['w3-red','w3-button']);
+            x.html('&plus;');
+            x.click(function () {
+                jQuery('#ts_modal_selectors').show();
+            });
+        } else {
+            x.removeClass(['w3-red','w3-button']);
+            x.html(mk_get_spinner('w3-text-red mk-jumbo'));
+            x.off();
+    }
     }
 
     function update_selects() {
