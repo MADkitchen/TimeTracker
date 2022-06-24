@@ -122,12 +122,12 @@ defined('ABSPATH') || exit;
                     }]
             },
             options: {
-                    plugins: {legend: false},
-                    //maintainAspectRatio: false,
-                    responsive: true,
-                    aspectRatio: 1
+                plugins: {legend: false},
+                //maintainAspectRatio: false,
+                responsive: true,
+                aspectRatio: 1
 
-                }
+            }
         });
 
         return [

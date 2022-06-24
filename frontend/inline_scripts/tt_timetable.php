@@ -51,7 +51,7 @@ defined('ABSPATH') || exit;
         jQuery('[data-day="' + day + '"]').each(function () {
             sum += Number(jQuery(this).text());
         });
-        jQuery("#ts_subtot_" + day).text(round(sum, 2));
+        jQuery("#ts_subtot_" + day).text(mk_round(sum, 2));
     }
 
     function update_total() {
@@ -60,7 +60,7 @@ defined('ABSPATH') || exit;
             sum += Number(jQuery(this).text());
 
         });
-        jQuery("#ts_tot").text(round(sum, 2));
+        jQuery("#ts_tot").text(mk_round(sum, 2));
     }
 
 <?php js_build_table_changed() ?>
@@ -70,7 +70,7 @@ defined('ABSPATH') || exit;
         let year = jQuery("#ts_table_year").val();
         let week = jQuery("#ts_table_week").val();
         y = jQuery('#ts_header_select');
-        y.html(get_spinner('w3-text-white mk-jumbo'));
+        y.html(mk_get_spinner('w3-text-white mk-jumbo'));
         jQuery.ajax({
             type: 'POST',
             data: {action: 'ajax_build_timesheet',
@@ -87,16 +87,6 @@ defined('ABSPATH') || exit;
             }
         });
     }
-
-    function get_spinner(extra_classes = '') {
-        return '<div class="w3-center w3-spin ' + extra_classes + '">&ring;</div>';
-    }
-
-    function round(num, places = 0) {
-        return +(Math.round(num + "e+" + places) + "e-" + places);
-    }
-
-    ;
 </script>
 <?php
 

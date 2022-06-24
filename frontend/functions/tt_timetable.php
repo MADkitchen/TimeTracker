@@ -372,7 +372,7 @@ function js_build_activity_click() {
 
     $retval .= "    const id_no = $rule;\n"
             . "        if (!$('#ts_row_' + id_no).length) {\n"
-            . "            y.html(get_spinner('w3-text-white mk-jumbo'));\n"
+            . "            y.html(mk_get_spinner('w3-text-white mk-jumbo'));\n"
             . "            $.ajax({\n"
             . "                type: 'POST',\n"
             . "                data: {action: 'ajax_build_row',\n";
@@ -415,7 +415,7 @@ function js_build_update_entry() {
     $rule = get_row_label_id('print_js');
     $retval .= "        const id_no = $rule;\n"
             . "        let y = jQuery('#ts_row_' + id_no + ' [data-day=\"' + day + '\"]');\n"
-            . "        y.html(get_spinner('w3-text-red mk-jumbo'));\n"
+            . "        y.html(mk_get_spinner('w3-text-red mk-jumbo'));\n"
             . "        jQuery.ajax({\n"
             . "            type: 'POST',\n"
             . "            data: {action: 'ajax_send_to_db',\n";
@@ -436,7 +436,7 @@ function js_build_update_entry() {
             . "                    y.text('');\n"
             . "                    y.data('key', '');\n"
             . "                } else if (data !== 'FAILED') { //TODO: finalize\n"
-            . "                    y.text(round(val,2));\n"
+            . "                    y.text(mk_round(val,2));\n"
             . "                    y.data('key', data);\n"
             . "                } else { //TODO: finalize\n"
             . "                }\n"
