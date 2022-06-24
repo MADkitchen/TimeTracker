@@ -188,6 +188,7 @@ function ajax_build_report() {
 
     $w['selectors'] = populate_selectors($filtered_query ?? [], $original_query ?? [], $date_range ?? [], $_POST['current_group']);
     $w['chartsdata'][] = chart1_get_data($filtered_query ?? [], $date_range ?? []);
+    $w['chartsdata'][] = chart2_get_data($filtered_query ?? [], $date_range ?? []);
 
     $v = json_encode($w);
 
@@ -220,6 +221,40 @@ function chart1_get_data($args = [], $date_range = []) {
             $w[$key][] = $value; //ts_resolve_relation($key, $value);
         }
     }
+
+    return $w;
+}
+
+function chart2_get_data($args = [], $date_range = []) {
+
+    if (!isset($date_range)) {
+        $date_range = get_filter_date_range();
+    }
+
+
+    $default_args = ['sum' => [
+            'time_units'
+        ],
+        'groupby' => [
+            'activity_id'],
+    ];
+
+    $x = ts_query_items(
+            array_merge($default_args, $args, isset($date_range['query']) ? $date_range['query'] : [])
+    );
+
+    $w = [];
+    foreach ($x as $z) {
+        foreach ($z as $key => $value) {
+            $w[$key][] = $value; //ts_resolve_relation($key, $value);
+        }
+    }
+
+    $w['activity_id'] = array_map(function ($a) {
+        $row = ts_get_column_value_by_id('activity_id', $a, true);
+        return $row->activity_id . ' - ' . $row->activity_id_name;
+    }, $w['activity_id']
+    );
 
     return $w;
 }

@@ -71,6 +71,7 @@ defined('ABSPATH') || exit;
                 jQuery('#tsr_selectors').html(data.selectors);
                 update_selects();
                 xhrObj.chartobjects[0] = build_graph(data.chartsdata[0]);
+                xhrObj.chartobjects[1] = build_graph2(data.chartsdata[1]);
             },
             error: function (textStatus, errorThrown, jqXHR) {
                 //console.log('textStatus');
@@ -92,14 +93,45 @@ defined('ABSPATH') || exit;
                             fill: false,
                             borderColor: 'rgb(75, 192, 192)',
                             tension: 0.1
-                        }],
-                    options: [{
-                            //maintainAspectRatio: false,
-                            responsive: true,
-                            aspectRatio: 3
                         }]
+                },
+                options: {
+                    plugins: {legend: false},
+                    responsive: true,
+                    aspectRatio: 3
                 }
             })
+        ];
+    }
+
+    function build_graph2(data_in) {
+        const ctx = document.getElementById('myChart2').getContext('2d');
+
+        let x = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data_in['activity_id'],
+                datasets: [{
+                        label: '<?php echo ts_get_column_prop('time_units', 'description') ?>',
+                        data: data_in['sum_time_units'],
+                        fill: false,
+                        //borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        backgroundColor: get_random_rgb(data_in['activity_id'].length),
+                        cutout: "50%"
+                    }]
+            },
+            options: {
+                    plugins: {legend: false},
+                    //maintainAspectRatio: false,
+                    responsive: true,
+                    aspectRatio: 1
+
+                }
+        });
+
+        return [
+            x
         ];
     }
 
