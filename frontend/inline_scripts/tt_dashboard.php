@@ -29,14 +29,22 @@ defined('ABSPATH') || exit;
         chartobjects: [null]
     };
     jQuery(document).ready(function ($) {
-        $('input:checkbox').prop("checked", false);
-        let a = $('input#after');
+        jQuery('#tsr_selectors_open_modal_reset').click(reset_all);
+        reset_all();
+    });
+
+    function reset_all() {
+        jQuery('#tsr_selectors_open_modal_reset').hide();
+        jQuery('#tsr_selectors div[name="reset"]:visible').hide();
+        jQuery('input:checkbox').prop("checked", false);
+        let a = jQuery('input#after');
         a.val(a.prop('min'));
-        let b = $('input#before');
+        let b = jQuery('input#before');
         b.val(b.prop('max'));
         update_selects();
         refresh_report();
-    });
+    }
+
     function request_data(xhrObj) {
         let data = {};
         jQuery('input[name^="' + select_identifier + '"]:checked').each(function () {
@@ -219,7 +227,7 @@ defined('ABSPATH') || exit;
     }
 
     function toggle_open_modal(show = true) {
-        const x = jQuery('#tsr_selectors_open_modal');
+        const x = jQuery('#tsr_selectors_open_modal_label');
         if (show === true) {
             x.addClass(['w3-red', 'w3-button']);
             x.html('&plus;');
@@ -247,6 +255,9 @@ defined('ABSPATH') || exit;
             jQuery(this).hide();
             refresh_report();
         });
+        if (jQuery('#tsr_selectors div[name="reset"]:visible').length) {
+            jQuery('#tsr_selectors_open_modal_reset').show();
+        }
     }
 
     function refresh_report(e) {

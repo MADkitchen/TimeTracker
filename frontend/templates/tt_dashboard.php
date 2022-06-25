@@ -32,7 +32,10 @@ defined('ABSPATH') || exit;
     </div>
 </div>
 
-<div id="tsr_selectors_open_modal" class="w3-ripple w3-block w3-xlarge"></div>
+<div id="tsr_selectors_open_modal" class="w3-xlarge" style="position:relative">
+    <div id="tsr_selectors_open_modal_reset" class="w3-button w3-red w3-display-topleft" style="display:none">&#9745;</div>
+    <div id="tsr_selectors_open_modal_label" class="w3-ripple w3-block"></div>
+</div>
 
 <div class="w3-row">
     <div class="w3-padding w3-col l6 m12 s12" style="position: relative;  margin: auto;">
