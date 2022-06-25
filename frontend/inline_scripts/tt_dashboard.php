@@ -260,7 +260,7 @@ defined('ABSPATH') || exit;
             jQuery(this).hide();
             fire_refresh_report();
         });
-        if (jQuery('#tsr_selectors div[name="reset"]:visible').length) {
+        if (jQuery('#tsr_selectors input:checkbox:checked').length) {
             jQuery('#tsr_selectors_open_modal_reset').show();
         }
     }
