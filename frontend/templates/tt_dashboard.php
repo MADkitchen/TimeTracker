@@ -24,17 +24,23 @@ defined('ABSPATH') || exit;
 <div class="w3-container">
     <div id="ts_modal_selectors" class="w3-modal w3-card">
         <div class="w3-modal-content  w3-red">
-            <div class="w3-button w3-red w3-ripple w3-block w3-xlarge"" onclick="jQuery('#ts_modal_selectors').hide()" style="padding:0; margin:0">&times;</div>
+            <div class="w3-button w3-red w3-ripple w3-block w3-xlarge" onclick="jQuery('#ts_modal_selectors').hide()" style="padding:0; margin:0">&times;</div>
             <div id="tsr_selectors" class="w3-cell-row">
                 <?php //echo populate_selectors() ?>
             </div>
-        </div>
-    </div>
+</div>
+</div>
 </div>
 
+<div class="w3-row w3-margin-bottom">
 <div id="tsr_selectors_open_modal" class="w3-xlarge" style="position:relative">
-    <div id="tsr_selectors_open_modal_reset" class="w3-button w3-red w3-display-topleft" style="display:none">&#9745;</div>
-    <div id="tsr_selectors_open_modal_label" class="w3-ripple w3-block"></div>
+<div id="tsr_selectors_open_modal_reset" class="w3-button w3-red w3-display-topleft" style="display:none">&#9745;</div>
+<div id="tsr_selectors_open_modal_label" class="w3-ripple w3-col l8 m6 s12"></div>
+</div>
+<div id="totals_widget" class="w3-col w3-border w3-border-red w3-text-red l4 m6 s12 w3-white" style="position: relative;  margin: auto; display:none">
+    <div class="w3-text-red mk-small" style="float: right;"><?php echo ts_get_column_prop('time_units', 'description') ?></div>
+<div id="total_time" class="mk-xxlarge" style="float:right"></div>
+</div>
 </div>
 
 <div class="w3-row">
@@ -46,7 +52,7 @@ defined('ABSPATH') || exit;
     </div>
 </div>
 
-<div class="w3-padding" style="position: relative;  margin: auto;  width: 100%;">
+<div class="w3-padding w3-block" style="position: relative;  margin: auto;">
     <canvas id="myChart"></canvas>
 </div>
 

@@ -72,6 +72,7 @@ defined('ABSPATH') || exit;
             url: '<?php echo admin_url('admin-ajax.php') ?>',
             success: function (data) {
                 jQuery('#tsr_selectors').html(data.selectors);
+                jQuery('#total_time').html(data.total);
                 update_selects();
                 toggle_open_modal();
                 xhrObj.chartobjects[0] = build_graph(data.chartsdata[0]);
@@ -229,12 +230,14 @@ defined('ABSPATH') || exit;
     function toggle_open_modal(show = true) {
         const x = jQuery('#tsr_selectors_open_modal_label');
         if (show === true) {
+            jQuery('#totals_widget').show();
             x.addClass(['w3-red', 'w3-button']);
             x.html('&plus;');
             x.click(function () {
                 jQuery('#ts_modal_selectors').show();
             });
         } else {
+            jQuery('#totals_widget').hide();
             x.removeClass(['w3-red', 'w3-button']);
             x.html(mk_get_spinner('w3-text-red mk-jumbo'));
             x.off();

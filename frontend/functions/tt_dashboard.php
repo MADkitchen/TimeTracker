@@ -191,6 +191,14 @@ function ajax_build_report() {
     $w['chartsdata'][] = chart2_get_data($filtered_query ?? [], $date_range ?? []);
     $w['chartsdata'][] = chart3_get_data($filtered_query ?? [], $date_range ?? []);
 
+    //TODO: generalize
+    $tot = 0;
+    foreach ($w['chartsdata'][0]['sum_time_units'] as $item) {
+        $tot += $item;
+    }
+
+    $w['total'] = round($tot);
+
     $v = json_encode($w);
 
     echo $v;
