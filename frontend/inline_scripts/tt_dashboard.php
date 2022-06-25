@@ -28,18 +28,15 @@ defined('ABSPATH') || exit;
         ajaxobject: null,
         chartobjects: [null]
     };
-
     jQuery(document).ready(function ($) {
         $('input:checkbox').prop("checked", false);
         let a = $('input#after');
         a.val(a.prop('min'));
         let b = $('input#before');
         b.val(b.prop('max'));
-
         update_selects();
         refresh_report();
     });
-
     function request_data(xhrObj) {
         let data = {};
         jQuery('input[name^="' + select_identifier + '"]:checked').each(function () {
@@ -59,9 +56,7 @@ defined('ABSPATH') || exit;
         if (b.val() !== b.prop('max'))
             data['before'] = b.val();
         let z = JSON.stringify(data);
-
         toggle_open_modal(false);
-
         xhrObj.ajaxobject = jQuery.ajax({
             type: 'POST',
             data: {action: 'ajax_build_report', data_out: z, current_group: w},
@@ -73,6 +68,7 @@ defined('ABSPATH') || exit;
                 toggle_open_modal();
                 xhrObj.chartobjects[0] = build_graph(data.chartsdata[0]);
                 xhrObj.chartobjects[1] = build_graph2(data.chartsdata[1]);
+                xhrObj.chartobjects[2] = build_graph3(data.chartsdata[2]);
             },
             error: function (textStatus, errorThrown, jqXHR) {
                 //console.log('textStatus');
@@ -107,7 +103,6 @@ defined('ABSPATH') || exit;
 
     function build_graph2(data_in) {
         const ctx = document.getElementById('myChart2').getContext('2d');
-
         let x = new Chart(ctx, {
             type: 'pie',
             data: {
@@ -115,37 +110,100 @@ defined('ABSPATH') || exit;
                 datasets: [{
                         label: '<?php echo ts_get_column_prop('time_units', 'description') ?>',
                         data: data_in['sum_time_units'],
-                        fill: false,
+                        //fill: false,
                         //borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        backgroundColor: get_random_rgb(data_in['activity_id'].length),
-                        cutout: "50%"
+                        //tension: 0.1,
+                        backgroundColor: get_random_rgb(data_in['sum_time_units'].length),
+                        //cutout: "50%",
+                        hoverOffset: 10
                     }]
             },
             options: {
-                plugins: {legend: false},
+                plugins: {
+                    legend: false,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        offset: 20,
+                        //clamp: true,
+                        /*display: function (context) {
+                         const res = context.chart.data.datasets[0].data[context.dataIndex] > context.chart.data.datasets[0].data[context.dataIndex - 1] ? 'auto' : true;
+                         return res; // display labels with an odd index
+                         },*/
+                        display: 'auto',
+                        formatter: function (value, context) {
+                            const res = context.chart.data.labels[context.dataIndex];
+                            return res.lengt < 20 ? res : res.substring(0, 20) + '...';
+                        },
+                        borderWidth: 1
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 150,
+                        right: 150,
+                        top: 20,
+                        bottom: 20
+                    }
+
+                },
                 //maintainAspectRatio: false,
                 responsive: true,
                 aspectRatio: 1
 
             }
         });
-
         return [
             x
+        ];
+    }
+
+    function build_graph3(data_in) {
+        const ctx = document.getElementById('myChart3').getContext('2d');
+        return [
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data_in['activity_group'],
+                    datasets: [{
+                            label: '<?php echo ts_get_column_prop('time_units', 'description') ?>',
+                            data: data_in['sum_time_units'],
+                            backgroundColor: get_random_rgb(data_in['sum_time_units'].length),
+                            hoverOffset: 10
+                        }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            ticks: {
+                                callback: function (val, index) {
+                                    const res = this.getLabelForValue(val);
+                                    return res.lengt < 20 ? res : res.substring(0, 20) + '...';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: false,
+                        datalabels: false
+                    },
+                    responsive: true,
+                    aspectRatio: 1
+                }
+            })
         ];
     }
 
     function toggle_open_modal(show = true) {
         const x = jQuery('#tsr_selectors_open_modal');
         if (show === true) {
-            x.addClass(['w3-red','w3-button']);
+            x.addClass(['w3-red', 'w3-button']);
             x.html('&plus;');
             x.click(function () {
                 jQuery('#ts_modal_selectors').show();
             });
         } else {
-            x.removeClass(['w3-red','w3-button']);
+            x.removeClass(['w3-red', 'w3-button']);
             x.html(mk_get_spinner('w3-text-red mk-jumbo'));
             x.off();
     }
@@ -155,7 +213,6 @@ defined('ABSPATH') || exit;
         jQuery('input[name^="' + select_identifier + '"]').change(refresh_report);
         jQuery('input#after').change(refresh_report);
         jQuery('input#before').change(refresh_report);
-
         jQuery('div[name="reset"]').click(function () {
             let a = jQuery(this).siblings('div[name="block"]');
             a.children('input:checkbox').prop("checked", false);
@@ -187,14 +244,11 @@ defined('ABSPATH') || exit;
                     chartobjects: [null],
                     lastclickedobj: e ? e.target.name : ''
                 };
-
                 request_data(xhrObj);
-
                 xhrQueue = [];
                 xhrCount = 0;
             }
         }, 2000);
-
     }
 
     function toggle(x) {
