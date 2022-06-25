@@ -92,7 +92,11 @@ defined('ABSPATH') || exit;
                 options: {
                     plugins: {
                         legend: false,
-                        datalabels: false
+                        datalabels: false,
+                        title: {
+                            display: true,
+                            text: '<?php echo ts_get_column_prop('time_units', 'description'). ' per ' . ts_get_column_prop('date_rec', 'description')?>'
+                        }
                     },
                     responsive: true,
                     aspectRatio: 3,
@@ -148,7 +152,11 @@ defined('ABSPATH') || exit;
                             return res.lengt < 20 ? res : res.substring(0, 20) + '...';
                         },
                         borderWidth: 1
-                    }
+                    },
+                        title: {
+                            display: true,
+                            text: '<?php echo ts_get_column_prop('time_units', 'description'). ' per ' . ts_get_column_prop('activity_id', 'description')?>'
+                        }
                 },
                 layout: {
                     padding: {
@@ -197,7 +205,11 @@ defined('ABSPATH') || exit;
                     },
                     plugins: {
                         legend: false,
-                        datalabels: false
+                        datalabels: false,
+                        title: {
+                            display: true,
+                            text: '<?php echo ts_get_column_prop('time_units', 'description'). ' per ' . ts_get_column_prop('activity_group', 'description')?>'
+                        }
                     },
                     responsive: true,
                     aspectRatio: 1
