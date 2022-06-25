@@ -296,7 +296,7 @@ function chart3_get_data($args = [], $date_range = []) {
     $y['activity_group'] = array_unique($w['activity_group']);
     foreach ($w['sum_time_units'] as $key => $value) {
         $index = array_search($w['activity_group'][$key], $y['activity_group']);
-        $y['sum_time_units'][$index] = $y['sum_time_units'][$index] ?? 0 + $value;
+        $y['sum_time_units'][$index] = ($y['sum_time_units'][$index] ?? 0) + $value;
     }
     $y['activity_group'] = array_values($y['activity_group']);
     $y['sum_time_units'] = array_values($y['sum_time_units']);
