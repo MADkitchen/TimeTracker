@@ -28,6 +28,8 @@ defined('ABSPATH') || exit;
         ajaxobject: null,
         chartobjects: [null]
     };
+    var last_timer = 0;
+
     jQuery(document).ready(function ($) {
         jQuery('#tsr_selectors_open_modal_reset').click(reset_all);
         reset_all();
@@ -42,7 +44,7 @@ defined('ABSPATH') || exit;
         let b = jQuery('input#before');
         b.val(b.prop('max'));
         update_selects();
-        refresh_report();
+        fire_refresh_report();
     }
 
     function request_data(xhrObj) {
@@ -245,9 +247,9 @@ defined('ABSPATH') || exit;
     }
 
     function update_selects() {
-        jQuery('input[name^="' + select_identifier + '"]').change(refresh_report);
-        jQuery('input#after').change(refresh_report);
-        jQuery('input#before').change(refresh_report);
+        jQuery('input[name^="' + select_identifier + '"]').change(enqueue_refresh_report);
+        jQuery('input#after').change(enqueue_refresh_report);
+        jQuery('input#before').change(enqueue_refresh_report);
         jQuery('div[name="reset"]').click(function () {
             let a = jQuery(this).siblings('div[name="block"]');
             a.children('input:checkbox').prop("checked", false);
@@ -256,37 +258,42 @@ defined('ABSPATH') || exit;
             let b = a.children('input#before');
             b.val(b.prop('max'));
             jQuery(this).hide();
-            refresh_report();
+            fire_refresh_report();
         });
         if (jQuery('#tsr_selectors div[name="reset"]:visible').length) {
             jQuery('#tsr_selectors_open_modal_reset').show();
         }
     }
 
-    function refresh_report(e) {
+    function enqueue_refresh_report(e) {
 
         xhrQueue.push(xhrCount);
-        setTimeout(function () {
+        last_timer = setTimeout(function () {
             xhrCount = ++xhrCount;
             if (xhrCount === xhrQueue.length) {
-                if (xhrObj.ajaxobject !== null) {
-                    xhrObj.ajaxobject.abort();
-                }
-                xhrObj.chartobjects.forEach(function (value, index, chart) {
-                    if (value !== null) {
-                        chart[index][0].destroy();
-                    }
-                });
-                xhrObj = {
-                    ajaxobject: null,
-                    chartobjects: [null],
-                    lastclickedobj: e ? e.target.name : ''
-                };
-                request_data(xhrObj);
+                fire_refresh_report(e);
                 xhrQueue = [];
                 xhrCount = 0;
             }
         }, 2000);
+    }
+
+    function fire_refresh_report(e) {
+        clearTimeout(setTimeout);
+        if (xhrObj.ajaxobject !== null) {
+            xhrObj.ajaxobject.abort();
+        }
+        xhrObj.chartobjects.forEach(function (value, index, chart) {
+            if (value !== null) {
+                chart[index][0].destroy();
+            }
+        });
+        xhrObj = {
+            ajaxobject: null,
+            chartobjects: [null],
+            lastclickedobj: e ? e.target.name : ''
+        };
+        request_data(xhrObj);
     }
 
     function toggle(x) {
