@@ -95,11 +95,11 @@ defined('ABSPATH') || exit;
                         datalabels: false,
                         title: {
                             display: true,
-                            text: '<?php echo ts_get_column_prop('time_units', 'description'). ' per ' . ts_get_column_prop('date_rec', 'description')?>'
+                            text: '<?php echo ts_get_column_prop('time_units', 'description') . ' per ' . ts_get_column_prop('date_rec', 'description') ?>'
                         }
                     },
                     responsive: true,
-                    aspectRatio: 3,
+                    aspectRatio: 2,
                     elements: {
                         line: {
                             fill: false,
@@ -153,10 +153,10 @@ defined('ABSPATH') || exit;
                         },
                         borderWidth: 1
                     },
-                        title: {
-                            display: true,
-                            text: '<?php echo ts_get_column_prop('time_units', 'description'). ' per ' . ts_get_column_prop('activity_id', 'description')?>'
-                        }
+                    title: {
+                        display: true,
+                        text: '<?php echo ts_get_column_prop('time_units', 'description') . ' per ' . ts_get_column_prop('activity_id', 'description') ?>'
+                    }
                 },
                 layout: {
                     padding: {
@@ -208,11 +208,11 @@ defined('ABSPATH') || exit;
                         datalabels: false,
                         title: {
                             display: true,
-                            text: '<?php echo ts_get_column_prop('time_units', 'description'). ' per ' . ts_get_column_prop('activity_group', 'description')?>'
+                            text: '<?php echo ts_get_column_prop('time_units', 'description') . ' per ' . ts_get_column_prop('activity_group', 'description') ?>'
                         }
                     },
                     responsive: true,
-                    aspectRatio: 1
+                    aspectRatio: 1.1
                 }
             })
         ];
