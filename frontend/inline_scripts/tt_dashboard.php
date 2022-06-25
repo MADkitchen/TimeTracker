@@ -36,7 +36,6 @@ defined('ABSPATH') || exit;
     });
 
     function reset_all() {
-        jQuery('#tsr_selectors_open_modal_reset').hide();
         jQuery('#tsr_selectors div[name="reset"]:visible').hide();
         jQuery('input:checkbox').prop("checked", false);
         let a = jQuery('input#after');
@@ -240,6 +239,7 @@ defined('ABSPATH') || exit;
             });
         } else {
             jQuery('#totals_widget').hide();
+            jQuery('#tsr_selectors_open_modal_reset').hide();
             x.removeClass(['w3-red', 'w3-button']);
             x.html(mk_get_spinner('w3-text-red mk-jumbo'));
             x.off();
@@ -262,6 +262,8 @@ defined('ABSPATH') || exit;
         });
         if (jQuery('#tsr_selectors input:checkbox:checked').length) {
             jQuery('#tsr_selectors_open_modal_reset').show();
+        } else {
+            jQuery('#tsr_selectors_open_modal_reset').hide();
         }
     }
 
