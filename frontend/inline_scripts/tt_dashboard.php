@@ -86,16 +86,28 @@ defined('ABSPATH') || exit;
                     labels: data_in['date_rec'],
                     datasets: [{
                             label: '<?php echo ts_get_column_prop('time_units', 'description') ?>',
-                            data: data_in['sum_time_units'],
-                            fill: false,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1
+                            data: data_in['sum_time_units']
                         }]
                 },
                 options: {
-                    plugins: {legend: false},
+                    plugins: {
+                        legend: false,
+                        datalabels: false
+                    },
                     responsive: true,
-                    aspectRatio: 3
+                    aspectRatio: 3,
+                    elements: {
+                        line: {
+                            fill: false,
+                            borderColor: get_random_rgb(data_in['sum_time_units'].length),
+                            tension: 0.1,
+                            borderWidth: 1
+                        },
+                        point: {
+                            borderColor: 'rgb(0,0,0,0)',
+                            backgroundColor: 'rgb(0,0,0,0)'
+                        }
+                    }
                 }
             })
         ];
