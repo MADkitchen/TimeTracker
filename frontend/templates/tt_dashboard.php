@@ -35,15 +35,15 @@ defined('ABSPATH') || exit;
 <div id="tsr_selectors_open_modal" class="w3-ripple w3-block w3-xlarge"></div>
 
 <div class="w3-row">
-    <div class="chart-container w3-col l6 m12 s12" style="position: relative;  margin: auto;">
+    <div class="w3-padding w3-col l6 m12 s12" style="position: relative;  margin: auto;">
         <canvas id="myChart2"></canvas>
     </div>
-        <div class="chart-container w3-col l6 m12 s12" style="position: relative;  margin: auto;">
+    <div class="w3-padding w3-col l6 m12 s12" style="position: relative;  margin: auto;">
         <canvas id="myChart3"></canvas>
     </div>
 </div>
 
-<div class="chart-container" style="position: relative;  margin: auto;  width: 100%;">
+<div class="w3-padding" style="position: relative;  margin: auto;  width: 100%;">
     <canvas id="myChart"></canvas>
 </div>
 
