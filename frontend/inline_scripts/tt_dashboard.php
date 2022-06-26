@@ -300,7 +300,7 @@ defined('ABSPATH') || exit;
 
     function toggle(x) {
         jQuery('[id^="tsr_select_"]').not(x).next('div').hide();
-        jQuery(x).next('div').toggle();
+        jQuery(x).next().toggle();
     }
 
 

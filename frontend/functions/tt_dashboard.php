@@ -50,12 +50,18 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
             $value = $entry->table == 'timetable' ? $entry->value : $entry->key; //TODO: improve last parameter logic (main tableitems)
             $checked = $is_filtered && in_array($value, $original_query[$column]);
             $disabled = $is_alone && !$checked;
-            $inner .= sprintf('<input name="tsr_select_%2$s" type="checkbox" value="%1$s" data-key="%3$s"' . checked($checked, true, false) . disabled($disabled, true, false) . '> <label>%1$s</label><br>', get_label($data, $entry, $column), $column, $value);
+            $inner .= sprintf('<label>%1$s<input name="tsr_select_%2$s" type="checkbox" value="%1$s" data-key="%3$s" style="float: left"' . checked($checked, true, false) . disabled($disabled, true, false) . '><br></label>', get_label($data, $entry, $column), $column, $value);
         }
         $show_column = $current_group !== $column ? "display:none" : "";
         $html[$column] = '<div id="tsr_select_' . $column . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
                 . ts_get_column_prop($column, 'description')
-                . '</div><div name="block" style="' . $show_column . '" class="w3-padding w3-white">' . $inner . '</div>';
+                . '</div>'
+                .'<div name="block" style="' . $show_column . '" class="w3-padding w3-white">'
+                . ($is_filtered ?'': ts_get_search_field("jQuery(this).parent().next().find('label')",'jQuery([])',"jQuery(this).parent().next()","jQuery(this).val()","false","jQuery(this).parent().next()"))
+                .'<div>'
+                . $inner
+                . '</div>'
+                . '</div>';
     }
     $html = array_map(function ($a) use ($button_wrapper) {
         $display = str_contains($a, checked(true, true, false)) ? '' : ' style="display:none"';

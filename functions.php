@@ -30,10 +30,10 @@ function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_t
 }
 
 function ts_query_items($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
-    $defaults=[
-        'order'=>'ASC'
+    $defaults = [
+        'order' => 'ASC'
     ];
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, array_merge($defaults,$arg))->items;
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, array_merge($defaults, $arg))->items;
 }
 
 function ts_update_item($key, $arg, $table = 'timetable') {
@@ -392,4 +392,19 @@ function ts_build_hierarchical_table(array $ordered_list) {
     $retval .= sprintf($footer_row, join('', $btm_buttons));
 
     echo sprintf($table, $retval);
+}
+
+//TODO: generalize better
+function ts_get_search_field($item_sel = 'jQuery([])', $grp_swc_sel = 'jQuery([])', $grp_blk_sel = 'jQuery([])', $val = 'jQuery(this).val()', $close_on_exit = 'false',$open_on_exit = 'false') {
+    global $mk_plugin_url; //TODO: cleanup
+    return '<div><input type="search" placeholder="Search..." id="ts_modal_search" onkeyup="'
+            . get_one_word_find_args($item_sel, $grp_swc_sel, $grp_blk_sel, $val, $close_on_exit,$open_on_exit)
+            . '" class="w3-white w3-input" style="background-image: url(\''
+            . $mk_plugin_url . join('/', array('assets', 'images', 'searchicon.png'))
+            . '\'); background-position: 14px 12px; background-repeat: no-repeat; padding: 14px 20px 12px 45px;"></div>';
+}
+
+//TODO: generalize better
+function get_one_word_find_args($item_sel = "jQuery([])", $grp_swc_sel = "jQuery([])", $grp_blk_sel = "jQuery([])", $val = 'jQuery(this).val()', $close_on_exit = 'false',$open_on_exit = 'false') {
+    return htmlspecialchars("one_word_find($item_sel,$grp_swc_sel,$grp_blk_sel,$val,$close_on_exit,$open_on_exit);");
 }
