@@ -260,7 +260,9 @@ defined('ABSPATH') || exit;
             jQuery(this).hide();
             fire_refresh_report();
         });
-        if (jQuery('#tsr_selectors input:checkbox:checked').length) {
+        const a = jQuery('#after');
+        const b = jQuery('#before');
+        if (jQuery('#tsr_selectors input:checkbox:checked').length || a.val() !== a.prop('min') || b.val() !== b.prop('max')) {
             jQuery('#tsr_selectors_open_modal_reset').show();
         } else {
             jQuery('#tsr_selectors_open_modal_reset').hide();
