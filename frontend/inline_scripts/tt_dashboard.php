@@ -129,6 +129,35 @@ defined('ABSPATH') || exit;
 
     function build_graph2(data_in) {
         const ctx = document.getElementById('myChart2').getContext('2d');
+        let datalabels_opt = false;
+        let layout_opt = {};
+        if (window.innerWidth > 600) {
+            datalabels_opt = {
+                anchor: 'end',
+                align: 'end',
+                offset: 20,
+                //clamp: true,
+                /*display: function (context) {
+                 const res = context.chart.data.datasets[0].data[context.dataIndex] > context.chart.data.datasets[0].data[context.dataIndex - 1] ? 'auto' : true;
+                 return res; // display labels with an odd index
+                 },*/
+                display: 'auto',
+                formatter: function (value, context) {
+                    const res = context.chart.data.labels[context.dataIndex];
+                    return res.lengt < 20 ? res : res.substring(0, 20) + '...';
+                },
+                borderWidth: 1
+            };
+            layout_opt = {
+                padding: {
+                    left: 150,
+                    right: 150,
+                    top: 20,
+                    bottom: 20
+                }
+            };
+        }
+
         let x = new Chart(ctx, {
             type: 'pie',
             data: {
@@ -140,6 +169,7 @@ defined('ABSPATH') || exit;
                         //borderColor: 'rgb(75, 192, 192)',
                         //tension: 0.1,
                         backgroundColor: get_random_rgb(data_in['sum_time_units'].length),
+                        borderWidth: 0,
                         //cutout: "50%",
                         hoverOffset: 10
                     }]
@@ -147,36 +177,13 @@ defined('ABSPATH') || exit;
             options: {
                 plugins: {
                     legend: false,
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'end',
-                        offset: 20,
-                        //clamp: true,
-                        /*display: function (context) {
-                         const res = context.chart.data.datasets[0].data[context.dataIndex] > context.chart.data.datasets[0].data[context.dataIndex - 1] ? 'auto' : true;
-                         return res; // display labels with an odd index
-                         },*/
-                        display: 'auto',
-                        formatter: function (value, context) {
-                            const res = context.chart.data.labels[context.dataIndex];
-                            return res.lengt < 20 ? res : res.substring(0, 20) + '...';
-                        },
-                        borderWidth: 1
-                    },
+                    datalabels: datalabels_opt,
                     title: {
                         display: true,
                         text: '<?php echo ts_get_column_prop('time_units', 'description') . ' per ' . ts_get_column_prop('activity_id', 'description') ?>'
                     }
                 },
-                layout: {
-                    padding: {
-                        left: 150,
-                        right: 150,
-                        top: 20,
-                        bottom: 20
-                    }
-
-                },
+                layout: layout_opt,
                 //maintainAspectRatio: false,
                 responsive: true,
                 aspectRatio: 1
