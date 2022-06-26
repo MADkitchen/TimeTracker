@@ -168,19 +168,7 @@ function get_job_tags() { //filter query by user later
     $tags = ts_get_column_prop(['job_no', 'job_wbs', 'job_tag']);
     $w = [];
     foreach ($tags as $tag) {
-        $x = ts_query_items(
-                [
-                    //'count' => true,
-                    'groupby' => [
-                        'id', //TODO: generalize id
-                    ],
-                    'orderby' => [
-                        $tag,
-                    ],
-                    'order' => 'ASC',
-                ],
-                ts_get_table_source($tag)
-        );
+        $x = ts_get_lookup_table_data(ts_get_table_source($tag));
 
         foreach ($x as $row) {
             //optimize conversion to entries

@@ -30,10 +30,7 @@ function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_t
 }
 
 function ts_query_items($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
-    $defaults = [
-        'order' => 'ASC'
-    ];
-    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, array_merge($defaults, $arg))->items;
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, $arg)->items;
 }
 
 function ts_update_item($key, $arg, $table = 'timetable') {
@@ -101,29 +98,19 @@ function ts_get_lookup_columns($this_column, $this_table = 'timetable') {
 }
 
 function ts_get_activities() {
-    $items = ts_query_items([
-        'count' => true,
-        'groupby' => [
-            'activity_group',
-            'activity_id',
-            'activity_id_name',
-            'id'
-        ],
-        'order' => 'ASC',
-        'orderby' => ['activity_id']
-            ],
-            'activity_id');
+
+    $items = ts_get_lookup_table_data(ts_get_table_source('activity_id'));
+
     $retval = [];
 
     foreach ($items as $item) {
-        $activity_id_id = $item['id'];
-        $activity_id = $item['activity_id']; //ts_resolve_relation('activity_id', $item['activity_id'], null, 'activity_id');
-        $activity_id_name = $item['activity_id_name']; //ts_resolve_relation('activity_id_name', $item['activity_id_name'], null, 'activity_id');
-        $activity_group = ts_get_column_value_by_id('activity_group', $item['activity_group']);
+        $activity_id_id = $item->id; //TODO: generalize 'id'
+        $activity_id = $item->activity_id; //ts_resolve_relation('activity_id', $item['activity_id'], null, 'activity_id');
+        $activity_id_name = $item->activity_id_name; //ts_resolve_relation('activity_id_name', $item['activity_id_name'], null, 'activity_id');
+        $activity_group = ts_get_column_value_by_id('activity_group', $item->activity_group);
         $retval[$activity_group][$activity_id_id]['no'] = $activity_id;
         $retval[$activity_group][$activity_id_id]['name'] = $activity_id_name;
-        $retval[$activity_group]['name'] = ts_get_column_value_by_id('activity_group_name', $item['activity_group']);
-        ;
+        $retval[$activity_group]['name'] = ts_get_column_value_by_id('activity_group_name', $item->activity_group);
     }
     return $retval;
 }
@@ -150,7 +137,6 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                     'orderby' => [
                         $a,
                     ],
-                    'order' => 'ASC',
                 ];
 
                 $x = ts_query_items(
@@ -180,7 +166,6 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                                     'orderby' => [
                                         $a,
                                     ],
-                                    'order' => 'ASC',
                                 ],
                                 ts_get_table_source($a)
                         );
@@ -395,16 +380,20 @@ function ts_build_hierarchical_table(array $ordered_list) {
 }
 
 //TODO: generalize better
-function ts_get_search_field($item_sel = 'jQuery([])', $grp_swc_sel = 'jQuery([])', $grp_blk_sel = 'jQuery([])', $val = 'jQuery(this).val()', $close_on_exit = 'false',$open_on_exit = 'false') {
+function ts_get_search_field($item_sel = 'jQuery([])', $grp_swc_sel = 'jQuery([])', $grp_blk_sel = 'jQuery([])', $val = 'jQuery(this).val()', $close_on_exit = 'false', $open_on_exit = 'false') {
     global $mk_plugin_url; //TODO: cleanup
     return '<div><input type="search" placeholder="Search..." id="ts_modal_search" onkeyup="'
-            . get_one_word_find_args($item_sel, $grp_swc_sel, $grp_blk_sel, $val, $close_on_exit,$open_on_exit)
+            . get_one_word_find_args($item_sel, $grp_swc_sel, $grp_blk_sel, $val, $close_on_exit, $open_on_exit)
             . '" class="w3-white w3-input" style="background-image: url(\''
             . $mk_plugin_url . join('/', array('assets', 'images', 'searchicon.png'))
             . '\'); background-position: 14px 12px; background-repeat: no-repeat; padding: 14px 20px 12px 45px;"></div>';
 }
 
 //TODO: generalize better
-function get_one_word_find_args($item_sel = "jQuery([])", $grp_swc_sel = "jQuery([])", $grp_blk_sel = "jQuery([])", $val = 'jQuery(this).val()', $close_on_exit = 'false',$open_on_exit = 'false') {
+function get_one_word_find_args($item_sel = "jQuery([])", $grp_swc_sel = "jQuery([])", $grp_blk_sel = "jQuery([])", $val = 'jQuery(this).val()', $close_on_exit = 'false', $open_on_exit = 'false') {
     return htmlspecialchars("one_word_find($item_sel,$grp_swc_sel,$grp_blk_sel,$val,$close_on_exit,$open_on_exit);");
+}
+
+function ts_get_lookup_table_data($table) {
+    return \MADkitchen\Database\Handler::maybe_get_lookup_table('TimeTracker', $table);
 }
