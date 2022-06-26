@@ -236,20 +236,14 @@ defined('ABSPATH') || exit;
     }
 
     function toggle_open_modal(show = true) {
-        const x = jQuery('#tsr_selectors_open_modal_label');
+        const x = jQuery('#tsr_selectors_open_modal_block');
+        const y = jQuery('#tsr_selectors_spinner');
         if (show === true) {
-            jQuery('#totals_widget').show();
-            x.addClass(['w3-red', 'w3-button']);
-            x.html('&plus;');
-            x.click(function () {
-                jQuery('#ts_modal_selectors').show();
-            });
+            x.show();
+            y.html('');
         } else {
-            jQuery('#totals_widget').hide();
-            jQuery('#tsr_selectors_open_modal_reset').hide();
-            x.removeClass(['w3-red', 'w3-button']);
-            x.html(mk_get_spinner('w3-text-red mk-jumbo'));
-            x.off();
+            x.hide();
+            y.html(mk_get_spinner('w3-text-red mk-jumbo'));
     }
     }
 
