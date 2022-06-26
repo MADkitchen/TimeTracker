@@ -50,7 +50,7 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
             $value = $entry->table == 'timetable' ? $entry->value : $entry->key; //TODO: improve last parameter logic (main tableitems)
             $checked = $is_filtered && in_array($value, $original_query[$column]);
             $disabled = $is_alone && !$checked;
-            $inner .= sprintf('<label>%1$s<input name="tsr_select_%2$s" type="checkbox" value="%1$s" data-key="%3$s" style="float: left"' . checked($checked, true, false) . disabled($disabled, true, false) . '><br></label>', get_label($data, $entry, $column), $column, $value);
+            $inner .= sprintf('<label><input name="tsr_select_%2$s" type="checkbox" value="%1$s" data-key="%3$s"' . checked($checked, true, false) . disabled($disabled, true, false) . '>%1$s<br></label>', get_label($data, $entry, $column), $column, $value);
         }
         $show_column = $current_group !== $column ? "display:none" : "";
         $html[$column] = '<div id="tsr_select_' . $column . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
