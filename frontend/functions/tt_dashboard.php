@@ -56,9 +56,9 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
         $html[$column] = '<div id="tsr_select_' . $column . '" class="w3-button w3-red w3-ripple w3-block" onclick="toggle(this)">'
                 . ts_get_column_prop($column, 'description')
                 . '</div>'
-                .'<div name="block" style="' . $show_column . '" class="w3-padding w3-white">'
-                . ($is_filtered ?'': ts_get_search_field("jQuery(this).parent().next().find('label')",'jQuery([])',"jQuery(this).parent().next()","jQuery(this).val()","false","jQuery(this).parent().next()"))
-                .'<div>'
+                . '<div name="block" style="' . $show_column . '" class="w3-padding w3-white">'
+                . ($is_filtered || $is_alone ? '' : ts_get_search_field("jQuery(this).parent().next().find('label')", 'jQuery([])', "jQuery(this).parent().next()", "jQuery(this).val()", "false", "jQuery(this).parent().next()"))
+                . '<div>'
                 . $inner
                 . '</div>'
                 . '</div>';

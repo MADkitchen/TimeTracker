@@ -59,6 +59,7 @@ function build_table($year = null, $week = null) {
 
     $user = ts_get_current_user();
     if (empty($user)) {
+        //TODO: print out message user is not registered in tt
         return;
     }
 
