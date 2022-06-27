@@ -134,9 +134,9 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                     'groupby' => [
                         ts_is_lookup_table($base_table ?? ts_get_table_source($a)) ? 'id' : $a, //TODO: generalize 'id'
                     ],
-                    'orderby' => [
+                    /*'orderby' => [
                         $a,
-                    ],
+                    ],*/
                 ];
 
                 $x = ts_query_items(
@@ -150,6 +150,9 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                     } else {
                         $found = ts_get_entry_by_id($a, $item->$a);
                     }
+                    if (!empty($found)) {
+                        $data_tot[$a][] = $found;
+                    }
                 }
                 $data_buffer = array_diff($data_buffer, [$a]);
             } else {
@@ -162,25 +165,28 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                         $x = ts_query_items(
                                 ['id' => array_map(fn($y) => $y->row->$a, //TODO generalize 'id'
                                             $data_tot[$lookup_column]),
-                                    'orderby' => [
+                                    /*'orderby' => [
                                         $a,
-                                    ],
+                                    ],*/
                                 ],
                                 ts_get_table_source($a)
                         );
                         foreach ($x as $item) {
                             $found = ts_get_entry_by_row($a, $item); //ts_get_entry_by_id($a, $item->$a);
+                            if (!empty($found)) {
+                                $data_tot[$a][] = $found;
+                            }
                         }
                     } else {
                         foreach ($data_tot[$lookup_column] as $lookup_entry) {
                             $found = ts_get_entry_by_row($a, $lookup_entry->row);
+                            if (!empty($found)) {
+                                $data_tot[$a][] = $found;
+                            }
                         }
                     }
                     $data_buffer = array_diff($data_buffer, [$a]);
                 }
-            }
-            if (!empty($found)) {
-                $data_tot[$a][] = $found;
             }
         }
         if ($watchdog++ > 3)
