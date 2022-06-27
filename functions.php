@@ -124,7 +124,7 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
         $i = false;
         foreach ($data_buffer as $a) {
             $lookup_columns = array_intersect($data_cols, ts_get_lookup_columns($a));
-
+            $found = null;
             if (empty($lookup_columns)) {
                 $watchdog = 0;
                 $a = ts_get_column_prop($a);
@@ -144,12 +144,11 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                         $base_table ?? ts_get_table_source($a),
                 );
 
-                $data_tot[$a] = [];
                 foreach ($x as $item) {
                     if (ts_get_table_source($a) === ($base_table ?? ts_get_table_source($a))) { //will not be used eventually...
-                        $data_tot[$a][] = ts_get_entry_by_row($a, $item);
+                        $found = ts_get_entry_by_row($a, $item);
                     } else {
-                        $data_tot[$a][] = ts_get_entry_by_id($a, $item->$a);
+                        $found = ts_get_entry_by_id($a, $item->$a);
                     }
                 }
                 $data_buffer = array_diff($data_buffer, [$a]);
@@ -170,15 +169,18 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                                 ts_get_table_source($a)
                         );
                         foreach ($x as $item) {
-                            $data_tot[$a][] = ts_get_entry_by_row($a, $item); //ts_get_entry_by_id($a, $item->$a);
+                            $found = ts_get_entry_by_row($a, $item); //ts_get_entry_by_id($a, $item->$a);
                         }
                     } else {
                         foreach ($data_tot[$lookup_column] as $lookup_entry) {
-                            $data_tot[$a][] = ts_get_entry_by_row($a, $lookup_entry->row);
+                            $found = ts_get_entry_by_row($a, $lookup_entry->row);
                         }
                     }
                     $data_buffer = array_diff($data_buffer, [$a]);
                 }
+            }
+            if (!empty($found)) {
+                $data_tot[$a][] = $found;
             }
         }
         if ($watchdog++ > 3)
@@ -235,7 +237,7 @@ function ts_add_external_columns_to_query_res($external_columns, $ref_columns, &
     if (empty($base_table)) {
 
         foreach ($queries as $key => $query) {
-            $extra_entries = array_merge($extra_entries, filter_args_out(array_merge($external_columns, $ref_columns), ['id' => $query])); //TODO: generalize 'id'
+            $extra_entries = array_merge($extra_entries, filter_args_out(array_merge($external_columns, [$key]), ['id' => $query])); //TODO: generalize 'id'
         }
     } else {
         $extra_entries = filter_args_out(array_merge($external_columns, $ref_columns), $queries, 'timetable');
