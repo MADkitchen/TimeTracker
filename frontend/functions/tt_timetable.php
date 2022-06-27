@@ -64,7 +64,7 @@ function build_table($year = null, $week = null) {
     }
 
     $x = ts_query_items([
-        'user_name' => $user->id, //TODO: generalize 'id'
+        'user_name' => $user, //TODO: generalize 'id'
         'sum' => [
             'time_units'
         ],
@@ -274,6 +274,7 @@ function fill_activitylist() {
 
 function ajax_send_to_db() {
 //TODO: improve sanitization
+    //TODO: TEST LOGGEDUSER
 
     if (isset($_POST['date_rec']) &&
             isset($_POST['activity_id']) &&

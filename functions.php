@@ -134,9 +134,9 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                     'groupby' => [
                         ts_is_lookup_table($base_table ?? ts_get_table_source($a)) ? 'id' : $a, //TODO: generalize 'id'
                     ],
-                    /*'orderby' => [
-                        $a,
-                    ],*/
+                        /* 'orderby' => [
+                          $a,
+                          ], */
                 ];
 
                 $x = ts_query_items(
@@ -165,9 +165,9 @@ function filter_args_out($data_cols, $query = [], $base_table = null) {
                         $x = ts_query_items(
                                 ['id' => array_map(fn($y) => $y->row->$a, //TODO generalize 'id'
                                             $data_tot[$lookup_column]),
-                                    /*'orderby' => [
-                                        $a,
-                                    ],*/
+                                /* 'orderby' => [
+                                  $a,
+                                  ], */
                                 ],
                                 ts_get_table_source($a)
                         );
@@ -286,7 +286,7 @@ function get_label($dataset_entries, $this_entry, $this_column) {
 function ts_get_current_user() {
     global $current_user;
 
-    return reset(ts_query_items(['wp_id' => [$current_user->id]], 'user_name')) ?? null;
+    return (ts_query_items(['wp_id' => [$current_user->id]], 'user_name')[0]->id) ?? null; //TODO: generalize id
 }
 
 //$hierarchy is an array of items hierarchically linked and ordered from top to bottom, at caller's responsibility
