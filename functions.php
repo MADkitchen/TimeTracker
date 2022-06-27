@@ -306,7 +306,7 @@ function ts_get_hierarchical_structure($hierarchy) {
                 $retval[$item_tag]['count'][$levels[$item_tag]->id] = 1;
             } else {
                 $retval[$item_tag]['ids'][$levels[$item_tag]->id][$levels[$prev_tag]->id] = $retval[$prev_tag]['ids'][$levels[$prev_tag]->id];
-                $retval[$item_tag]['count'][$levels[$item_tag]->id] = ($retval[$item_tag]['count'][$levels[$item_tag]->id] ?? 0) + $retval[$prev_tag]['count'][$levels[$prev_tag]->id];
+                $retval[$item_tag]['count'][$levels[$item_tag]->id] = ($retval[$item_tag]['count'][$levels[$item_tag]->id] ?? 0) + 1;
             }
             //$retval[$item_tag]['count'][$levels[$item_tag]->id]--; //table is assumed aligned hence row is shared between columns
             $retval[$item_tag]['rows'][$levels[$item_tag]->id] = $levels[$item_tag];
