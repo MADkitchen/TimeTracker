@@ -20,7 +20,23 @@
 defined('ABSPATH') || exit;
 ?>
 
-<div class="w3-responsive">
-        <?php ts_build_hierarchical_table(['activity_group', 'activity_id']) ?>
-    Buttons are disabled in this test.
+<div class="w3-container">
+    <div id="ts_modal" class="w3-modal w3-card">
+        <div class="w3-modal-content">
+            <div id="ts_close_modal" class="w3-button w3-red w3-ripple w3-block w3-xlarge"" onclick="jQuery('#ts_modal').hide();" style="padding:0; margin:0">&times;</div>
+            <div class="w3-large w3-padding-large w3-center">
+            Buttons are disabled in this test.
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="w3-responsive">
+    <?php ts_build_hierarchical_table(['activity_group', 'activity_id']) ?>
+</div>
+
+<script>
+    jQuery('.w3-button').not('#ts_close_modal').click(function () {
+        jQuery('#ts_modal').show();
+    });
+</script>
