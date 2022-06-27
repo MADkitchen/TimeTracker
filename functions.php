@@ -379,6 +379,46 @@ function ts_build_hierarchical_table(array $ordered_list) {
     echo sprintf($table, $retval);
 }
 
+//TODO: rationalize this mind of functions
+function ts_build_users_table() {
+
+    $ordered_list = [
+        'user_name',
+        'user_group',
+        'user_role',
+        'job_settings'
+    ];
+
+    $table = '<table class="w3-table-all w3-card w3-center mk-medium">%s</table>';
+
+    $header_row = '<tr class="w3-red">%s</tr>';
+    $header_cell = '<th class="mk-large w3-padding-16 w3-center">%1$s</th>';
+
+    $column_titles = array_map(fn($a) => sprintf($header_cell, $a),
+            array_map(fn($a) => ts_get_column_prop($a, 'description'), $ordered_list)
+    );
+    $retval = sprintf($header_row, join('', $column_titles));
+
+    $table_row = '<tr class="w3-center">%s</tr>';
+    $table_cell = '<td rowspan="%1$s" class="w3-button mk-cell w3-padding-16" data-key="%3$s" data-type="%4$s">%2$s</td>';
+
+    $x = ts_get_lookup_table_data('user_name');
+
+    //TODO:generalize!
+
+    foreach ($x as $item) {
+        $inner = '';
+        $inner .= sprintf($table_cell, '1', $item->user_name, $item->id, 'user_name');
+        $inner .= sprintf($table_cell, '1', ts_get_column_value_by_id('user_group', $item->user_group) . ' - ' . ts_get_column_value_by_id('user_group_name', $item->user_group), $item->user_group, 'user_group');
+        $inner .= sprintf($table_cell, '1', ts_get_column_value_by_id('user_role', $item->user_role) . ' - ' . ts_get_column_value_by_id('user_role_name', $item->user_role), $item->user_group, 'user_group');
+        $inner .= sprintf($table_cell, '1', '&plus;', $item->user_name, 'job_settings'); //develop!
+        $retval .= sprintf($table_row, $inner);
+    }
+
+
+    echo sprintf($table, $retval);
+}
+
 //TODO: generalize better
 function ts_get_search_field($item_sel = 'jQuery([])', $grp_swc_sel = 'jQuery([])', $grp_blk_sel = 'jQuery([])', $val = 'jQuery(this).val()', $close_on_exit = 'false', $open_on_exit = 'false') {
     global $mk_plugin_url; //TODO: cleanup

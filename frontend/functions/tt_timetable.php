@@ -31,7 +31,7 @@ function build_header($year = null, $week = null) {
 
     $retval_th = '<th id="ts_header_select" style="width:30%%; padding:0">%s</th>';
     $retval_select = '<select id="ts_table_%1$s" name="ts_table_%1$s" class="w3-button w3-ripple mk-large w3-block" style="padding:0; margin:0">%2$s</select>';
-    $retval_option = '<option value="%1$s" %2$s>%3$s</option>';
+    $retval_option = '<option class="w3-white" value="%1$s" %2$s>%3$s</option>';
 
     $retval1 = '';
     foreach (MADkitchen\Helpers\Time::get_years($year) as $no => $item) {
