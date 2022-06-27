@@ -253,10 +253,10 @@ defined('ABSPATH') || exit;
         jQuery('input#before').change(enqueue_refresh_report);
         jQuery('div[name="reset"]').click(function () {
             let a = jQuery(this).siblings('div[name="block"]');
-            a.children('input:checkbox').prop("checked", false);
-            let c = a.children('input#after');
+            a.find('input:checkbox').prop("checked", false);
+            let c = a.find('input#after');
             c.val(c.prop('min'));
-            let b = a.children('input#before');
+            let b = a.find('input#before');
             b.val(b.prop('max'));
             jQuery(this).hide();
             fire_refresh_report();
