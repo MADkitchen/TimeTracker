@@ -297,14 +297,15 @@ function ajax_send_to_db() {
             //TODO: implement role/group per job and fallback to default specified in username table if needed
             $user = ts_get_current_user();
             if (!empty($user)) {
+                $user_row=ts_get_column_value_by_id(ts_get_column_prop('user_name'), $user, true);
 
                 $retval = ts_add_items([
                     'activity_id' => $_POST['activity_id'],
                     'date_rec' => $_POST['date_rec'],
-                    'user_group' => $user->user_group,
+                    'user_group' => $user_row->user_group,
                     'time_units' => $_POST['time_units'],
-                    'user_name' => $user->id, //TODO: generalize 'id'
-                    'user_role' => $user->user_role,
+                    'user_name' => $user_row->id, //TODO: generalize 'id'
+                    'user_role' => $user_row->user_role,
                     'job_tag' => $_POST['job_tag'],
                 ]);
             }
