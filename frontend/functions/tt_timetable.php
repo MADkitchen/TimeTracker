@@ -179,7 +179,7 @@ function get_job_tags() { //filter query by user later
 
     foreach ($w['job_tag'] as $item) {
         $label = get_label($w, $item, 'job_tag');
-        echo "<option value=\"{$item->value}\" data-key=\"{$item->key}\">$label</option>";
+        echo "<option value=\"{$item->value}\" data-key=\"{$item->primary_key}\">$label</option>";
     }
 }
 

@@ -47,7 +47,7 @@ function ts_add_items($arg, $table = 'timetable') {
 
 //function ts_resolve_relation($column_source, $id_source, $column_target = null, $table_source = 'timetable') {
 function ts_get_column_value_by_id($column, $id, $get_row = false) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
+    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
     $row = $entry->set_key($id);
     if (!$get_row) {
         return $entry->value ?? null;
@@ -57,28 +57,28 @@ function ts_get_column_value_by_id($column, $id, $get_row = false) {
 }
 
 function ts_get_entry_by_id($column, $id) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
+    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
     $row = $entry->set_key($id);
     return $entry;
 }
 
 function ts_get_entry_by_value($column, $value) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
+    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
     $row = $entry->set_value($value);
     return $entry;
 }
 
 function ts_get_entry_by_row($column, $row) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
+    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
     $entry->set_row($row);
     return $entry;
 }
 
 function ts_get_id_by_column_value($column, $value, $get_row = false) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
+    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
     $row = $entry->set_value($value);
     if (!$get_row) {
-        return $entry->key ?? null;
+        return $entry->primary_key ?? null;
     } else {
         return $row ?? null;
     }
@@ -89,8 +89,8 @@ function ts_is_lookup_table($table) {
 }
 
 function ts_get_table_source($column) {
-    $entry = new MADkitchen\Database\Entry('TimeTracker', $column);
-    return $entry->get_source_table($column);
+    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
+    return $entry->source_table;
 }
 
 function ts_get_lookup_columns($this_column, $this_table = 'timetable') {
@@ -251,7 +251,7 @@ function ts_add_external_columns_to_query_res($external_columns, $ref_columns, &
 
     foreach ($extra_entries as $key => $entry) {
         if (in_array($key, $external_columns)) {
-            $ref_query_res[$key] = reset($entry)->key; //first item only
+            $ref_query_res[$key] = reset($entry)->primary_key; //first item only
         }
     }
 }
@@ -259,7 +259,7 @@ function ts_add_external_columns_to_query_res($external_columns, $ref_columns, &
 //check
 function get_data_row_by_id($data_column, $id) {
     foreach ($data_column as $item) {
-        if ($item->key == $id) {
+        if ($item->primary_key == $id) {
             return $item->row;
         }
     }
