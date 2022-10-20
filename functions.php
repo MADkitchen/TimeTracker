@@ -94,7 +94,7 @@ function ts_get_table_source($column) {
 }
 
 function ts_get_lookup_columns($this_column, $this_table = 'timetable') {
-    return MADkitchen\Database\Handler::get_lookup_columns('TimeTracker', $this_column, $this_table);
+    return MADkitchen\Database\Lookup::find_related_external_lookup_columns('TimeTracker', $this_column, $this_table);
 }
 
 function ts_get_activities() {
@@ -116,84 +116,7 @@ function ts_get_activities() {
 }
 
 function filter_args_out($data_cols, $query = [], $base_table = null) {
-    $data_cols = array_values($data_cols); //TODO: check if associative arrays are really needed upstream
-    $data_buffer = $data_cols;
-    $data_tot = [];
-    $watchdog = 0;
-    do {
-        $i = false;
-        foreach ($data_buffer as $a) {
-            $lookup_columns = array_intersect($data_cols, ts_get_lookup_columns($a));
-            $found = null;
-            if (empty($lookup_columns)) {
-                $watchdog = 0;
-                $a = ts_get_column_prop($a);
-
-                $default_args = [
-                    //'count' => true,
-                    'groupby' => [
-                        ts_is_lookup_table($base_table ?? ts_get_table_source($a)) ? 'id' : $a, //TODO: generalize 'id'
-                    ],
-                        /* 'orderby' => [
-                          $a,
-                          ], */
-                ];
-
-                $x = ts_query_items(
-                        array_merge($default_args, $query),
-                        $base_table ?? ts_get_table_source($a),
-                );
-
-                foreach ($x as $item) {
-                    if (ts_get_table_source($a) === ($base_table ?? ts_get_table_source($a))) { //will not be used eventually...
-                        $found = ts_get_entry_by_row($a, $item);
-                    } else {
-                        $found = ts_get_entry_by_id($a, $item->$a);
-                    }
-                    if (!empty($found)) {
-                        $data_tot[$a][] = $found;
-                    }
-                }
-                $data_buffer = array_diff($data_buffer, [$a]);
-            } else {
-                $i = true;
-                $lookup_column = reset($lookup_columns);
-                if (!empty($data_tot[$lookup_column])) { //first match only
-                    $search_table = ts_get_table_source($lookup_column);
-
-                    if (MADkitchen\Database\Handler::is_column_external('TimeTracker', $search_table, $a)) {
-                        $x = ts_query_items(
-                                ['id' => array_map(fn($y) => $y->row->$a, //TODO generalize 'id'
-                                            $data_tot[$lookup_column]),
-                                /* 'orderby' => [
-                                  $a,
-                                  ], */
-                                ],
-                                ts_get_table_source($a)
-                        );
-                        foreach ($x as $item) {
-                            $found = ts_get_entry_by_row($a, $item); //ts_get_entry_by_id($a, $item->$a);
-                            if (!empty($found)) {
-                                $data_tot[$a][] = $found;
-                            }
-                        }
-                    } else {
-                        foreach ($data_tot[$lookup_column] as $lookup_entry) {
-                            $found = ts_get_entry_by_row($a, $lookup_entry->row);
-                            if (!empty($found)) {
-                                $data_tot[$a][] = $found;
-                            }
-                        }
-                    }
-                    $data_buffer = array_diff($data_buffer, [$a]);
-                }
-            }
-        }
-        if ($watchdog++ > 3)
-            break;
-    } while ($i);
-
-    return MADkitchen\Helpers\Common::ksort_by_array($data_tot, $data_cols);
+    return \MADkitchen\Database\Lookup::recursively_resolve_lookup_group('TimeTracker', $data_cols, $query, $base_table);
 }
 
 function filter_args_in($args) {
@@ -443,5 +366,5 @@ function get_one_word_find_args($item_sel = "jQuery([])", $grp_swc_sel = "jQuery
 }
 
 function ts_get_lookup_table_data($table) {
-    return \MADkitchen\Database\Handler::maybe_get_lookup_table('TimeTracker', $table);
+    return \MADkitchen\Database\Lookup::maybe_get_lookup_table('TimeTracker', $table);
 }
