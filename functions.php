@@ -23,9 +23,9 @@ defined('ABSPATH') || exit;
 //Helpers
 function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_type = 'name') {
     if (is_array($tags)) {
-        return MADkitchen\Database\Handler::get_table_column_prop_array_by_key('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
+        return MADkitchen\Database\Handler::get_table_column_settings_array('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
     } else {
-        return MADkitchen\Database\Handler::get_table_column_prop_by_key('TimeTracker', 'timetable', $tags, $prop);
+        return MADkitchen\Database\Handler::get_table_column_setting('TimeTracker', 'timetable', $tags, $prop);
     }
 }
 
