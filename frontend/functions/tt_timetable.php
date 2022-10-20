@@ -68,9 +68,9 @@ function build_table($year = null, $week = null) {
         'sum' => [
             'time_units'
         ],
-        'groupby' => ts_get_column_prop(array_merge(get_timesheet_vars(), ['date_rec', 'id'])),
+        'groupby' => array_merge(get_timesheet_vars(), ['date_rec', 'id']),
         'date_query' => [
-            'column' => ts_get_column_prop('date_rec'),
+            'column' => 'date_rec',
             [
                 'before' => strtotime($days[6]['date']) + 1,
                 'after' => strtotime($days[0]['date']) - 1,
@@ -99,13 +99,13 @@ function build_table($year = null, $week = null) {
                 ts_add_external_columns_to_query_res($extra_cols, get_row_label_id(), $item);
 
                 $label = get_row_label_id($item);
-                $label_array = ts_get_column_prop($tot_cols, 'name', $item);
+                $label_array = ts_get_column_prop2($tot_cols, 'name', $item);
                 if (!array_key_exists($label, $rows)) {
                     $rows[$label] = $label_array;
                 }
                 $table[$label][$i] = [
-                    'value' => $item['sum_' . ts_get_column_prop('time_units')],
-                    'key' => $item[ts_get_column_prop('id')]
+                    'value' => $item['sum_' . 'time_units'],
+                    'key' => $item['id']
                 ];
 
                 $subtotals[$i] += $table[$label][$i]['value'];
@@ -166,7 +166,7 @@ function build_last_row($total = 0) {
 }
 
 function get_job_tags() { //filter query by user later
-    $tags = ts_get_column_prop(['job_no', 'job_wbs', 'job_tag']);
+    $tags = ['job_no', 'job_wbs', 'job_tag'];
     $w = [];
     foreach ($tags as $tag) {
         $x = ts_get_lookup_table_data(ts_get_table_source($tag));
@@ -194,15 +194,15 @@ function get_row_label_id($target = null) {
                     return $target[$x];
                 }, $array));
     } else if ($target === 'print_js') {
-        return implode('+"_"+', ts_get_column_prop($array));
+        return implode('+"_"+', $array);
     } else if (is_null($target)) {
-        return ts_get_column_prop($array);
+        return $array;
     }
 }
 
 function build_row($data, $values = array()) {
 
-    $labels = ts_get_column_prop(get_timesheet_vars());
+    $labels = get_timesheet_vars();
     $row_id = get_row_label_id($data);
 
     $retval = sprintf('<tr id="ts_row_%1$s" data-%2$s="%3$s" data-%4$s="%5$s">',
@@ -297,7 +297,7 @@ function ajax_send_to_db() {
             //TODO: implement role/group per job and fallback to default specified in username table if needed
             $user = ts_get_current_user();
             if (!empty($user)) {
-                $user_row=ts_get_column_value_by_id(ts_get_column_prop('user_name'), $user, true);
+                $user_row=ts_get_column_value_by_id(ts_get_column_prop2('user_name'), $user, true);
 
                 $retval = ts_add_items([
                     'activity_id' => $_POST['activity_id'],
@@ -324,7 +324,7 @@ function ajax_build_row() {
             isset($_POST['activity_id'])) {
 
         $extra_cols = array_diff(get_timesheet_vars(), get_row_label_id());
-        $item = ts_get_column_prop(get_row_label_id(), 'name', $_POST);
+        $item = ts_get_column_prop2(get_row_label_id(), 'name', $_POST);
         ts_add_external_columns_to_query_res($extra_cols, get_row_label_id(), $item);
 
         build_row($item);
@@ -352,10 +352,9 @@ function js_build_activity_click() {
     $array = get_row_label_id();
     unset($array['activity_id']);
     foreach ($array as $item) {
-        $item = ts_get_column_prop($item);
         $retval .= "    const $item = $('#ts_modal_select_$item option:selected').attr('data-key');\n";
     }
-    $item = ts_get_column_prop('activity_id');
+    $item = 'activity_id';
 
     $retval .= "    const $item = $(this).attr('data-key');\n";
 
@@ -370,7 +369,6 @@ function js_build_activity_click() {
 
     $output = [];
     foreach (get_row_label_id() as $item) {
-        $item = ts_get_column_prop($item);
         $output[] = "$item: $item";
     }
     $retval .= implode(",\n", $output) . "\n"
@@ -396,7 +394,6 @@ function js_build_update_entry() {
     $retval = " function update_entry(reset = false) {\n"
             . "        let x = jQuery('#ts_modal_entry');\n";
     foreach (get_row_label_id() as $item) {
-        $item = ts_get_column_prop($item);
         $retval .= "let $item = x.data('$item');\n";
     }
     $retval .= "        let day = x.data('day');\n"
@@ -412,11 +409,10 @@ function js_build_update_entry() {
             . "            data: {action: 'ajax_send_to_db',\n";
 
     foreach (array_merge(['date_rec'], get_row_label_id()) as $item) {
-        $item = ts_get_column_prop($item);
         $retval .= "$item: $item,\n";
     }
 
-    $item = ts_get_column_prop('time_units');
+    $item = 'time_units';
     $retval .= "$item: val,\n"
             . "                key: key\n"
             . "            },\n"
@@ -455,7 +451,6 @@ function js_build_table_changed() {
             . "\n";
 
     foreach (get_row_label_id() as $item) {
-        $item = ts_get_column_prop($item);
         $retval .= "x.data('$item', jQuery(this).parent().data('$item'));\n";
     }
 

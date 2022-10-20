@@ -146,7 +146,7 @@ function get_filter_date_range(&$filter = []) {
     //Prepare date query if needed
     if ($date_range) {
         $date_query = ['date_query' => [
-                'column' => ts_get_column_prop('date_rec'),
+                'column' => 'date_rec',
                 $date_range
             ]
         ];
@@ -186,7 +186,7 @@ function ajax_build_report() {
         $z = $_POST['data_out'];
         $y = json_decode(html_entity_decode(stripslashes($z)), true);
         if ($y) {
-            $original_query = ts_get_column_prop(get_report_vars(), 'name', $y);
+            $original_query = ts_get_column_prop2(get_report_vars(), 'name', $y);
             $filtered_query = filter_args_in($original_query);
             $date_range = get_filter_date_range($y);
         }

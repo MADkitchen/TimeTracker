@@ -49,7 +49,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
             'columns' => [
                 //id
                 'id' => [
-                    'name' => 'id',
                     'type' => 'bigint',
                     'length' => '20',
                     'unsigned' => true,
@@ -59,7 +58,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //activity_ID
                 'activity_id' => [
-                    'name' => 'activity_id',
                     'description' => 'Activities',
                     'type' => 'bigint',
                     'length' => '20',
@@ -70,7 +68,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //date
                 'date_rec' => [
-                    'name' => 'date_rec',
                     'description' => 'Dates',
                     'type' => 'DATE',
                     'date_query' => true,
@@ -80,7 +77,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //user_group
                 'user_group' => [
-                    'name' => 'user_group',
                     'description' => 'User cluster',
                     'type' => 'bigint',
                     'length' => '20',
@@ -91,7 +87,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //time_units
                 'time_units' => [
-                    'name' => 'time_units',
                     'description' => 'Time allocated',
                     'type' => 'DECIMAL',
                     'length' => '4,2',
@@ -99,7 +94,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //user_name
                 'user_name' => [
-                    'name' => 'user_name',
                     'description' => 'User name',
                     'type' => 'bigint',
                     'length' => '20',
@@ -110,7 +104,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //user_role
                 'user_role' => [
-                    'name' => 'user_role',
                     'description' => 'User role',
                     'type' => 'bigint',
                     'length' => '20',
@@ -121,7 +114,6 @@ class TimeTracker extends \MADkitchen\Modules\Module {
                 ],
                 //job_tag
                 'job_tag' => [
-                    'name' => 'job_tag',
                     'description' => 'Job tags',
                     'type' => 'bigint',
                     'length' => '20',

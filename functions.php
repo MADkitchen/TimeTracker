@@ -21,12 +21,12 @@
 defined('ABSPATH') || exit;
 
 //Helpers
-function ts_get_column_prop($tags, $prop = 'name', $target = array(), $key_out_type = 'name') {
-    if (is_array($tags)) {
-        return MADkitchen\Database\Handler::get_table_column_settings_array('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
-    } else {
+function ts_get_column_prop($tags, $prop) {
         return MADkitchen\Database\Handler::get_table_column_setting('TimeTracker', 'timetable', $tags, $prop);
-    }
+}
+
+function ts_get_column_prop2($tags, $prop = 'name', $target = array(), $key_out_type = 'name') {
+        return MADkitchen\Database\Handler::get_table_column_settings_array('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
 }
 
 function ts_query_items($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
