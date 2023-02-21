@@ -27,13 +27,9 @@ foreach ($ajax_functions as $item) {
     add_action('wp_ajax_nopriv_' . $item, $item);
 }
 
-function populate_selectors($filtered_query = [], $original_query = [], $date_range = [], $current_group = '') {
+function populate_selectors($data = [], $original_query = [], $date_range = [], $current_group = '') {
 
-    if (!$date_range) {
-        $date_range = get_filter_date_range();
-    }
-
-    $data = get_selectors_data($filtered_query, $date_range);
+    $data = array_intersect_key($data, array_flip(get_filterable_vars()));
 
     $button_wrapper = '<div style="position:relative">'
             . '<div name="reset" class="w3-button w3-red w3-display-topleft"%1$s>&#9745;</div>'
@@ -114,7 +110,7 @@ function populate_selectors($filtered_query = [], $original_query = [], $date_ra
     return $output;
 }
 
-function get_report_vars() {
+function get_filterable_vars() {
     return [
         'user_name',
         'user_group',
@@ -125,6 +121,15 @@ function get_report_vars() {
         'activity_group',
         'activity_id'
     ];
+}
+
+function get_charts_vars() {
+    return array_merge(
+            [
+                'activity_group_name',
+                'activity_id_name'
+            ],
+            get_filterable_vars());
 }
 
 function get_filter_date_range(&$filter = []) {
@@ -172,11 +177,11 @@ function get_filter_date_range(&$filter = []) {
 
 function get_selectors_data($filter = [], $date_range = []) {
 
-    $data_cols = get_report_vars();
-
     $query = array_merge($filter, isset($date_range['query']) ? $date_range['query'] : []);
 
-    return filter_args_out($data_cols, $query, 'timetable');
+    $query_object = \MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetable', $query);
+
+    return $query_object->separate_lookup_queries_to_array(get_filterable_vars());
 }
 
 function ajax_build_report() {
@@ -185,17 +190,35 @@ function ajax_build_report() {
     if (isset($_POST['data_out'])) {
         $z = $_POST['data_out'];
         $y = json_decode(html_entity_decode(stripslashes($z)), true);
-        if ($y) {
-            $original_query = ts_get_column_prop2(get_report_vars(), 'name', $y);
-            $filtered_query = filter_args_in($original_query);
-            $date_range = get_filter_date_range($y);
-        }
+
+        $original_query = $y ? array_intersect_key($y, array_flip(get_filterable_vars())) : [];
+
+        $query_object = \MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetable');
+
+        $zz = $query_object->translate_external_columns_queries($y);
+
+        $date_range = get_filter_date_range($y);
+
+        $query_object2 = ts_query(
+                array_merge(
+                        [
+                            'count' => true,
+                            'groupby' => get_filterable_vars(),
+                        ],
+                        $zz,
+                        $date_range['query']
+                ),
+        );
+
+        $query_object2->append_external_columns(get_charts_vars());
+        $items_array = \MADkitchen\Database\Handler::get_columns_array_from_rows($query_object2->items_resolved, get_charts_vars(), true);
+
     }
 
-    $w['selectors'] = populate_selectors($filtered_query ?? [], $original_query ?? [], $date_range ?? [], $_POST['current_group']);
-    $w['chartsdata'][] = chart1_get_data($filtered_query ?? [], $date_range ?? []);
-    $w['chartsdata'][] = chart2_get_data($filtered_query ?? [], $date_range ?? []);
-    $w['chartsdata'][] = chart3_get_data($filtered_query ?? [], $date_range ?? []);
+    $w['selectors'] = populate_selectors($items_array ?? [], $original_query ?? [], $date_range ?? [], $_POST['current_group']);
+    $w['chartsdata'][] = chart1_get_data($zz ?? [], $date_range ?? []);
+    $w['chartsdata'][] = chart2_get_data($zz ?? [], $date_range ?? []);
+    $w['chartsdata'][] = chart3_get_data($zz ?? [], $date_range ?? []);
 
     //TODO: generalize
     $tot = 0;
@@ -219,7 +242,7 @@ function chart1_get_data($args = [], $date_range = []) {
     }
 
 
-    $default_args = ['sum' => [
+    $chart_args = ['sum' => [
             'time_units'
         ],
         'groupby' => [
@@ -227,7 +250,7 @@ function chart1_get_data($args = [], $date_range = []) {
     ];
 
     $x = ts_query_items(
-            array_merge($default_args, $args, isset($date_range['query']) ? $date_range['query'] : [])
+            array_merge($args, $chart_args, isset($date_range['query']) ? $date_range['query'] : [])
     );
 
     $w = [];
@@ -246,32 +269,22 @@ function chart2_get_data($args = [], $date_range = []) {
         $date_range = get_filter_date_range();
     }
 
-
-    $default_args = ['sum' => [
+    $chart_args = ['sum' => [
             'time_units'
         ],
         'groupby' => [
             'activity_id'],
     ];
 
-    $x = ts_query_items(
-            array_merge($default_args, $args, isset($date_range['query']) ? $date_range['query'] : [])
+    $x = ts_query(
+            array_merge($args, $chart_args, isset($date_range['query']) ? $date_range['query'] : [])
     );
 
-    $w = [];
-    foreach ($x as $z) {
-        foreach ($z as $key => $value) {
-            $w[$key][] = $value; //ts_resolve_relation($key, $value);
-        }
-    }
+    $x->append_external_columns([
+        'activity_id_name',
+    ]);
 
-    $w['activity_id'] = array_map(function ($a) {
-        $row = ts_get_column_value_by_id('activity_id', $a, true);
-        return $row->activity_id . ' - ' . $row->activity_id_name;
-    }, $w['activity_id']
-    );
-
-    return $w;
+    return \MADkitchen\Database\Handler::get_columns_array_values_from_rows($x->items_resolved);
 }
 
 function chart3_get_data($args = [], $date_range = []) {
@@ -281,39 +294,24 @@ function chart3_get_data($args = [], $date_range = []) {
     }
 
 
-    $default_args = ['sum' => [
+    $chart_args = ['sum' => [
             'time_units'
         ],
         'groupby' => [
             'activity_id'],
     ];
 
-    $x = ts_query_items(
-            array_merge($default_args, $args, isset($date_range['query']) ? $date_range['query'] : [])
+    $x = ts_query(
+            array_merge($args, $chart_args, isset($date_range['query']) ? $date_range['query'] : [])
     );
 
-    $w = [];
-    foreach ($x as $z) {
-        foreach ($z as $key => $value) {
-            $w[$key][] = $value; //ts_resolve_relation($key, $value);
-        }
-    }
-//rename to activity_group
-    $w['activity_group'] = array_map(function ($a) {
-        $row = ts_get_column_value_by_id('activity_id', $a, true);
-        $row2 = ts_get_column_value_by_id('activity_group', $row->activity_group, true);
-        return $row2->activity_group . ' - ' . $row2->activity_group_name;
-    }, $w['activity_id']
-    );
+    $x->append_external_columns([
+        'activity_group',
+        'activity_group_name',
+    ]);
+    $x2 = \MADkitchen\Database\Lookup::groupby_items_rows_by_column($x->items_resolved, 'activity_group', ['sum_time_units']);
+    $x3 = \MADkitchen\Database\Handler::get_columns_array_values_from_rows($x2, ['activity_group', 'activity_group_name', 'sum_time_units']);
 
-    $y = [];
-    $y['activity_group'] = array_unique($w['activity_group']);
-    foreach ($w['sum_time_units'] as $key => $value) {
-        $index = array_search($w['activity_group'][$key], $y['activity_group']);
-        $y['sum_time_units'][$index] = ($y['sum_time_units'][$index] ?? 0) + $value;
-    }
-    $y['activity_group'] = array_values($y['activity_group']);
-    $y['sum_time_units'] = array_values($y['sum_time_units']);
+    return $x3;
 
-    return $y;
 }

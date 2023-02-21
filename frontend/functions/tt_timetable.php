@@ -63,12 +63,15 @@ function build_table($year = null, $week = null) {
         return;
     }
 
-    $x = ts_query_items([
-        'user_name' => $user, //TODO: generalize 'id'
+    $report_columns = get_timesheet_vars();
+    $primary_key=MADkitchen\Database\Handler::get_primary_key_column_name('TimeTracker', 'timetable');
+    $used_columns = ['date_rec', 'sum_time_units',$primary_key];  //TODO: generalize 'id'?
+    $query = [
+        'user_name' => $user,
         'sum' => [
             'time_units'
         ],
-        'groupby' => array_merge(get_timesheet_vars(), ['date_rec', 'id']),
+        'groupby' => array_merge(get_timesheet_vars(), ['date_rec'], [$primary_key]),
         'date_query' => [
             'column' => 'date_rec',
             [
@@ -77,7 +80,12 @@ function build_table($year = null, $week = null) {
             ]
         ]
             ,
-    ]);
+    ];
+
+    $query_object = \MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query('timetable', $query);
+    //$items=$query_object->items;
+    $query_object->append_external_columns(array_merge($report_columns, $used_columns));
+    $items = $query_object->items_resolved;
 
     $rows = [];
     $table = [];
@@ -89,27 +97,21 @@ function build_table($year = null, $week = null) {
             $i++) {
         $subtotals[$i] = 0;
 
-        $extra_cols = array_diff(get_timesheet_vars(), get_row_label_id());
+        foreach ($items as $item) {
+            if ($item['date_rec']->value == $days[$i]['date']) {
 
-        $tot_cols = get_timesheet_vars();
-
-        foreach ($x as $item) {
-            if ($item['date_rec'] == $days[$i]['date']) {
-
-                ts_add_external_columns_to_query_res($extra_cols, get_row_label_id(), $item);
-
+                //$item_keys = array_map(fn($x) => $x->primary_key, $item); //remove
                 $label = get_row_label_id($item);
-                $label_array = ts_get_column_prop2($tot_cols, 'name', $item);
                 if (!array_key_exists($label, $rows)) {
-                    $rows[$label] = $label_array;
+                    $rows[$label] = $item; //array_intersect_key($item, array_flip($report_columns));
                 }
-                $table[$label][$i] = [
-                    'value' => $item['sum_' . 'time_units'],
-                    'key' => $item['id']
-                ];
+                $table[$label][$i] = $item['sum_time_units']; /* [
+                  'value' => $item['sum_time_units']->value,
+                  'key' => $item['id']->value, //TODO generalize 'id'
+                  ]; */
 
-                $subtotals[$i] += $table[$label][$i]['value'];
-                $total += $table[$label][$i]['value'];
+                $subtotals[$i] += $table[$label][$i]->value;
+                $total += $table[$label][$i]->value;
             }
         }
     }
@@ -152,7 +154,7 @@ function build_subtotals_row($subtotals = array()) {
 function build_last_row($total = 0) {
 
     $retval = '<td id="ts_table_new" class="w3-xlarge" style="padding:0">';
-    $retval .= '<div onclick="'.get_one_word_find_args("jQuery('[id$=\"item\"]')","jQuery('[id$=\"group\"]')","jQuery('[id$=\"block\"]')").' jQuery(\'#ts_modal_search\').val(\'\'); jQuery(\'#ts_modal_newrow\').show();" class="w3-button w3-red w3-ripple w3-block">&plus;</div>';
+    $retval .= '<div onclick="' . get_one_word_find_args("jQuery('[id$=\"item\"]')", "jQuery('[id$=\"group\"]')", "jQuery('[id$=\"block\"]')") . ' jQuery(\'#ts_modal_search\').val(\'\'); jQuery(\'#ts_modal_newrow\').show();" class="w3-button w3-red w3-ripple w3-block">&plus;</div>';
     $retval .= '</td>';
     for ($i = 0;
             $i < 5;
@@ -191,7 +193,7 @@ function get_row_label_id($target = null) {
 
     if (is_array($target)) {
         return implode('_', array_map(function ($x)use ($target) {
-                    return $target[$x];
+                    return ($target[$x])->primary_key;
                 }, $array));
     } else if ($target === 'print_js') {
         return implode('+"_"+', $array);
@@ -202,43 +204,30 @@ function get_row_label_id($target = null) {
 
 function build_row($data, $values = array()) {
 
-    $labels = get_timesheet_vars();
     $row_id = get_row_label_id($data);
 
     $retval = sprintf('<tr id="ts_row_%1$s" data-%2$s="%3$s" data-%4$s="%5$s">',
             $row_id,
-            $labels['job_tag'],
-            $data[$labels['job_tag']],
-            $labels['activity_id'],
-            $data[$labels['activity_id']],
+            'job_tag',
+            $data['job_tag']->primary_key,
+            'activity_id',
+            $data['activity_id']->primary_key,
     );
-
-    //Resolve
-    if (!empty($data['job_tag'])) {
-        $data['job_no'] = ts_get_column_value_by_id('job_no', $data['job_no']);
-        $data['job_wbs'] = ts_get_column_value_by_id('job_wbs', $data['job_wbs']);
-        $data['job_tag'] = ts_get_column_value_by_id('job_tag', $data['job_tag']);
-    }
-
-    if (!empty($data['activity_id'])) {
-        $data['activity_id_name'] = ts_get_column_value_by_id('activity_id_name', $data['activity_id_name']);
-        $data['activity_id'] = ts_get_column_value_by_id('activity_id', $data['activity_id']);
-    }
 
     $retval .= '<td class="w3-center">';
     $retval .= '<div class="w3-row-padding w3-center">';
-    $retval .= '<div class="w3-third mk-medium">' . $data[$labels['job_no']] . '</div>';
-    $retval .= '<div class="w3-third mk-medium">' . $data[$labels['job_wbs']] . '</div>';
-    $retval .= '<div class="w3-third mk-medium">' . $data[$labels['job_tag']] . '</div>';
+    $retval .= '<div class="w3-third mk-medium">' . $data['job_no']->value . '</div>';
+    $retval .= '<div class="w3-third mk-medium">' . $data['job_wbs']->value . '</div>';
+    $retval .= '<div class="w3-third mk-medium">' . $data['job_tag']->value . '</div>';
     $retval .= '</div>';
-    $retval .= '<div class="w3-block w3-padding-16 mk-large">' . $data[$labels['activity_id']] . ' - ' . $data[$labels['activity_id_name']] . '</div>';
+    $retval .= '<div class="w3-block w3-padding-16 mk-large">' . $data['activity_id']->value . ' - ' . $data['activity_id_name']->value . '</div>';
     $retval .= '</td>';
 
     for ($i = 0;
             $i < 7;
             $i++) {
-        $key = isset($values[$i]) ? $values[$i]['key'] : '';
-        $value = isset($values[$i]) ? $values[$i]['value'] : '';
+        $key = isset($values[$i]) ? $values[$i]->primary_key : '';
+        $value = isset($values[$i]) ? $values[$i]->value : '';
         $retval .= '<td name="ts_' . $i . '_entry" data-day="' . $i . '" data-key="' . $key . '" class="w3-button mk-xlarge mk-cell">' . $value . '</td>';
     }
 
@@ -297,15 +286,15 @@ function ajax_send_to_db() {
             //TODO: implement role/group per job and fallback to default specified in username table if needed
             $user = ts_get_current_user();
             if (!empty($user)) {
-                $user_row=ts_get_column_value_by_id(ts_get_column_prop2('user_name'), $user, true);
+                $user_row = ts_get_column_value_by_id('user_name', $user, true);
 
                 $retval = ts_add_items([
                     'activity_id' => $_POST['activity_id'],
                     'date_rec' => $_POST['date_rec'],
-                    'user_group' => $user_row->user_group,
+                    'user_group' => $user_row['user_group'],
                     'time_units' => $_POST['time_units'],
-                    'user_name' => $user_row->id, //TODO: generalize 'id'
-                    'user_role' => $user_row->user_role,
+                    'user_name' => $user_row['id'], //TODO: generalize 'id'
+                    'user_role' => $user_row['user_role'],
                     'job_tag' => $_POST['job_tag'],
                 ]);
             }
@@ -323,11 +312,21 @@ function ajax_build_row() {
     if (isset($_POST['job_tag']) &&
             isset($_POST['activity_id'])) {
 
-        $extra_cols = array_diff(get_timesheet_vars(), get_row_label_id());
-        $item = ts_get_column_prop2(get_row_label_id(), 'name', $_POST);
-        ts_add_external_columns_to_query_res($extra_cols, get_row_label_id(), $item);
+        $res = [];
 
-        build_row($item);
+        foreach (['job_tag', 'activity_id'] as $column) {
+            $table = ts_get_table_source($column);
+            $query_object = ts_query([
+                MADkitchen\Database\Handler::get_primary_key_column_name('TimeTracker', $table) => $_POST[$column],
+                ], $table);
+            $query_object->append_external_columns(get_timesheet_vars());
+            $res = array_merge_recursive($res, reset($query_object->items_resolved));
+        }
+        //add sanitization
+
+        build_row($res, get_timesheet_vars());
+
+        //build_row(\MADkitchen\Database\Lookup::recursively_resolve_lookup_group('TimeTracker', $cols_group, $query));
     } else {
         return false;
     }
@@ -350,7 +349,8 @@ function js_build_activity_click() {
     $retval = "function () {\n"
             . "    let y = jQuery('#ts_table_new div');\n";
     $array = get_row_label_id();
-    unset($array['activity_id']);
+    //unset($array['activity_id']); //CHECK!
+    unset($array[1]);
     foreach ($array as $item) {
         $retval .= "    const $item = $('#ts_modal_select_$item option:selected').attr('data-key');\n";
     }

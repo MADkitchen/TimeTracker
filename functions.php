@@ -29,6 +29,10 @@ function ts_get_column_prop2($tags, $prop = 'name', $target = array(), $key_out_
         return MADkitchen\Database\Handler::get_table_column_settings_array('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
 }
 
+function ts_query($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
+    return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, $arg);
+}
+
 function ts_query_items($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
     return MADkitchen\Modules\Handler::$active_modules['TimeTracker']['class']->query($table, $arg)->items;
 }
@@ -47,7 +51,9 @@ function ts_add_items($arg, $table = 'timetable') {
 
 //function ts_resolve_relation($column_source, $id_source, $column_target = null, $table_source = 'timetable') {
 function ts_get_column_value_by_id($column, $id, $get_row = false) {
-    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
+    $entry = MADkitchen\Database\Lookup::build_ItemResolver('TimeTracker', $column);
+    if (empty($entry))
+        return null;
     $row = $entry->set_key($id);
     if (!$get_row) {
         return $entry->value ?? null;
@@ -57,25 +63,25 @@ function ts_get_column_value_by_id($column, $id, $get_row = false) {
 }
 
 function ts_get_entry_by_id($column, $id) {
-    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
+    $entry = MADkitchen\Database\Lookup::build_ItemResolver('TimeTracker', $column);
     $row = $entry->set_key($id);
     return $entry;
 }
 
 function ts_get_entry_by_value($column, $value) {
-    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
+    $entry = MADkitchen\Database\Lookup::build_ItemResolver('TimeTracker', $column);
     $row = $entry->set_value($value);
     return $entry;
 }
 
 function ts_get_entry_by_row($column, $row) {
-    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
-    $entry->set_row($row);
+    $entry = MADkitchen\Database\Lookup::build_ItemResolver('TimeTracker', $column);
+    $entry->force_row($row);
     return $entry;
 }
 
 function ts_get_id_by_column_value($column, $value, $get_row = false) {
-    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
+    $entry = MADkitchen\Database\Lookup::build_ItemResolver('TimeTracker', $column);
     $row = $entry->set_value($value);
     if (!$get_row) {
         return $entry->primary_key ?? null;
@@ -89,8 +95,7 @@ function ts_is_lookup_table($table) {
 }
 
 function ts_get_table_source($column) {
-    $entry = new MADkitchen\Database\Item('TimeTracker', $column);
-    return $entry->source_table;
+    return MADkitchen\Database\Handler::get_source_table('TimeTracker', $column);
 }
 
 function ts_get_lookup_columns($this_column, $this_table = 'timetable') {
@@ -104,20 +109,17 @@ function ts_get_activities() {
     $retval = [];
 
     foreach ($items as $item) {
-        $activity_id_id = $item->id; //TODO: generalize 'id'
-        $activity_id = $item->activity_id; //ts_resolve_relation('activity_id', $item['activity_id'], null, 'activity_id');
-        $activity_id_name = $item->activity_id_name; //ts_resolve_relation('activity_id_name', $item['activity_id_name'], null, 'activity_id');
-        $activity_group = ts_get_column_value_by_id('activity_group', $item->activity_group);
+        $activity_id_id = $item['id']; //TODO: generalize 'id'
+        $activity_id = $item['activity_id']; //ts_resolve_relation('activity_id', $item['activity_id'], null, 'activity_id');
+        $activity_id_name = $item['activity_id_name']; //ts_resolve_relation('activity_id_name', $item['activity_id_name'], null, 'activity_id');
+        $activity_group = ts_get_column_value_by_id('activity_group', $item['activity_group']);
         $retval[$activity_group][$activity_id_id]['no'] = $activity_id;
         $retval[$activity_group][$activity_id_id]['name'] = $activity_id_name;
-        $retval[$activity_group]['name'] = ts_get_column_value_by_id('activity_group_name', $item->activity_group);
+        $retval[$activity_group]['name'] = ts_get_column_value_by_id('activity_group_name', $item['activity_group']);
     }
     return $retval;
 }
 
-function filter_args_out($data_cols, $query = [], $base_table = null) {
-    return \MADkitchen\Database\Lookup::recursively_resolve_lookup_group('TimeTracker', $data_cols, $query, $base_table);
-}
 
 function filter_args_in($args) {
     $watchdog = 0;
@@ -125,7 +127,7 @@ function filter_args_in($args) {
         $i = false;
         foreach ($args as $ak => $a) {
 
-            $lookup_columns = array_intersect(get_report_vars(), ts_get_lookup_columns($ak));
+            $lookup_columns = array_intersect(get_filterable_vars(), ts_get_lookup_columns($ak));
 
             if (!empty($lookup_columns)) {
                 $watchdog = 0;
@@ -135,7 +137,7 @@ function filter_args_in($args) {
                         ts_get_table_source(reset($lookup_columns)) //first match only
                 );
 
-                $filtered = array_map(fn($y) => $y->id, $x);
+                $filtered = array_map(fn($y) => $y['id'], $x);
 
                 if (!empty($args[reset($lookup_columns)])) {
                     $args[reset($lookup_columns)] = array_intersect($args[reset($lookup_columns)], $filtered); //TODO: generalize 'id'
@@ -192,16 +194,16 @@ function get_label($dataset_entries, $this_entry, $this_column) {
     $retval = [];
     switch ($this_column) {
         case 'job_wbs':
-            $retval[] = get_data_row_by_id($dataset_entries['job_no'], $this_entry->row->job_no)->job_no; //TODO: generalize 'id'
+            $retval[] = get_data_row_by_id($dataset_entries['job_no'], $this_entry->row['job_no'])['job_no']; //TODO: generalize 'id'
             break;
         case 'job_tag':
-            $wbs_row = get_data_row_by_id($dataset_entries['job_wbs'], $this_entry->row->job_wbs);
-            $retval[] = get_data_row_by_id($dataset_entries['job_no'], $wbs_row->job_no)->job_no; //TODO: generalize 'id'
-            $retval[] = $wbs_row->job_wbs;
+            $wbs_row = get_data_row_by_id($dataset_entries['job_wbs'], $this_entry->row['job_wbs']);
+            $retval[] = get_data_row_by_id($dataset_entries['job_no'], $wbs_row['job_no'])['job_no']; //TODO: generalize 'id'
+            $retval[] = $wbs_row['job_wbs'];
             break;
     }
     $retval[] = $this_entry->value;
-    $retval[] = $this_entry->row->{"{$this_column}_name"} ?? null;
+    $retval[] = $this_entry->row["{$this_column}_name"] ?? null;
 
     return join(" ", $retval);
 }
@@ -209,7 +211,7 @@ function get_label($dataset_entries, $this_entry, $this_column) {
 function ts_get_current_user() {
     global $current_user;
 
-    return (ts_query_items(['wp_id' => [$current_user->id]], 'user_name')[0]->id) ?? null; //TODO: generalize id
+    return (ts_query_items(['wp_id' => [$current_user->id]], 'user_name')[0]['id']) ?? null; //TODO: generalize id
 }
 
 //$hierarchy is an array of items hierarchically linked and ordered from top to bottom, at caller's responsibility
@@ -231,16 +233,16 @@ function ts_get_hierarchical_structure($hierarchy) {
         $item_tag = reset($hierarchy);
 //TODO: generalize 'id'
         do {
-            $levels[$item_tag] = !empty($prev_tag) ? ts_get_column_value_by_id($item_tag, $levels[$prev_tag]->$item_tag, true) : $x_row;
+            $levels[$item_tag] = !empty($prev_tag) ? ts_get_column_value_by_id($item_tag, $levels[$prev_tag][$item_tag], true) : $x_row;
             if (empty($prev_tag)) {
-                $retval[$item_tag]['ids'][$levels[$item_tag]->id] = [];
-                $retval[$item_tag]['count'][$levels[$item_tag]->id] = 1;
+                $retval[$item_tag]['ids'][$levels[$item_tag]['id']] = [];
+                $retval[$item_tag]['count'][$levels[$item_tag]['id']] = 1;
             } else {
-                $retval[$item_tag]['ids'][$levels[$item_tag]->id][$levels[$prev_tag]->id] = $retval[$prev_tag]['ids'][$levels[$prev_tag]->id];
-                $retval[$item_tag]['count'][$levels[$item_tag]->id] = ($retval[$item_tag]['count'][$levels[$item_tag]->id] ?? 0) + 1;
+                $retval[$item_tag]['ids'][$levels[$item_tag]['id']][$levels[$prev_tag]['id']] = $retval[$prev_tag]['ids'][$levels[$prev_tag]['id']];
+                $retval[$item_tag]['count'][$levels[$item_tag]['id']] = ($retval[$item_tag]['count'][$levels[$item_tag]['id']] ?? 0) + 1;
             }
-            //$retval[$item_tag]['count'][$levels[$item_tag]->id]--; //table is assumed aligned hence row is shared between columns
-            $retval[$item_tag]['rows'][$levels[$item_tag]->id] = $levels[$item_tag];
+            //$retval[$item_tag]['count'][$levels[$item_tag]['id']]--; //table is assumed aligned hence row is shared between columns
+            $retval[$item_tag]['rows'][$levels[$item_tag]['id']] = $levels[$item_tag];
 
             $prev_tag = $item_tag;
         } while (($item_tag = next($hierarchy)) !== false);
@@ -263,7 +265,7 @@ function ts_get_table_inner_by_hierarchical_structure($hierarchical_structure) {
             if (!$this_span) {
                 $this_span = current($hierarchical_structure['data'][$item]['count']);
                 $this_key = key($hierarchical_structure['data'][$item]['count']);
-                $this_value = $hierarchical_structure['data'][$item]['rows'][$this_key]->$item . ' - ' . $hierarchical_structure['data'][$item]['rows'][$this_key]->{"{$item}_name"};
+                $this_value = $hierarchical_structure['data'][$item]['rows'][$this_key]->$item . ' - ' . $hierarchical_structure['data'][$item]['rows'][$this_key]["{$item}_name"];
                 $cells[$item][$i] = sprintf($table_cell, $this_span, $this_value, $this_key, $item);
                 next($hierarchical_structure['data'][$item]['count']);
             } else {
@@ -339,10 +341,10 @@ function ts_build_users_table() {
 
     foreach ($x as $item) {
         $inner = '';
-        $inner .= sprintf($table_cell, '1', $item->user_name, $item->id, 'user_name');
-        $inner .= sprintf($table_cell, '1', ts_get_column_value_by_id('user_group', $item->user_group) . ' - ' . ts_get_column_value_by_id('user_group_name', $item->user_group), $item->user_group, 'user_group');
-        $inner .= sprintf($table_cell, '1', ts_get_column_value_by_id('user_role', $item->user_role) . ' - ' . ts_get_column_value_by_id('user_role_name', $item->user_role), $item->user_group, 'user_group');
-        $inner .= sprintf($table_cell, '1', '&plus;', $item->user_name, 'job_settings'); //develop!
+        $inner .= sprintf($table_cell, '1', $item['user_name'], $item['id'], 'user_name');
+        $inner .= sprintf($table_cell, '1', ts_get_column_value_by_id('user_group', $item['user_group']) . ' - ' . ts_get_column_value_by_id('user_group_name', $item['user_group']), $item['user_group'], 'user_group');
+        $inner .= sprintf($table_cell, '1', ts_get_column_value_by_id('user_role', $item['user_role']) . ' - ' . ts_get_column_value_by_id('user_role_name', $item['user_role']), $item['user_group'], 'user_group');
+        $inner .= sprintf($table_cell, '1', '&plus;', $item['user_name'], 'job_settings'); //develop!
         $retval .= sprintf($table_row, $inner);
     }
 

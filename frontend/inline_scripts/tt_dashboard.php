@@ -131,6 +131,7 @@ defined('ABSPATH') || exit;
         const ctx = document.getElementById('myChart2').getContext('2d');
         let datalabels_opt = false;
         let layout_opt = {};
+
         if (window.innerWidth > 600) {
             datalabels_opt = {
                 anchor: 'end',
@@ -144,7 +145,7 @@ defined('ABSPATH') || exit;
                 display: 'auto',
                 formatter: function (value, context) {
                     const res = context.chart.data.labels[context.dataIndex];
-                    return res.lengt < 20 ? res : res.substring(0, 20) + '...';
+                    return res.length < 20 ? res : res.substring(0, 20) + '...';
                 },
                 borderWidth: 1
             };
@@ -161,7 +162,7 @@ defined('ABSPATH') || exit;
         let x = new Chart(ctx, {
             type: 'pie',
             data: {
-                labels: data_in['activity_id'],
+                labels: data_in['activity_id'].map((x, index) => {return x + ' - ' + data_in['activity_id_name'][index];}),
                 datasets: [{
                         label: '<?php echo ts_get_column_prop('time_units', 'description') ?>',
                         data: data_in['sum_time_units'],
@@ -201,7 +202,7 @@ defined('ABSPATH') || exit;
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data_in['activity_group'],
+                    labels: data_in['activity_group'].map((x, index) => {return x + ' - ' + data_in['activity_group_name'][index];}),
                     datasets: [{
                             label: '<?php echo ts_get_column_prop('time_units', 'description') ?>',
                             data: data_in['sum_time_units'],
@@ -215,7 +216,7 @@ defined('ABSPATH') || exit;
                             ticks: {
                                 callback: function (val, index) {
                                     const res = this.getLabelForValue(val);
-                                    return res.lengt < 20 ? res : res.substring(0, 20) + '...';
+                                    return res.length < 20 ? res : res.substring(0, 20) + '...';
                                 }
                             }
                         }
