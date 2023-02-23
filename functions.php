@@ -22,11 +22,11 @@ defined('ABSPATH') || exit;
 
 //Helpers
 function ts_get_column_prop($tags, $prop) {
-        return MADkitchen\Database\Handler::get_table_column_setting('TimeTracker', 'timetable', $tags, $prop);
+        return MADkitchen\Database\ColumnsHandler::get_table_column_setting('TimeTracker', 'timetable', $tags, $prop);
 }
 
 function ts_get_column_prop2($tags, $prop = 'name', $target = array(), $key_out_type = 'name') {
-        return MADkitchen\Database\Handler::get_table_column_settings_array('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
+        return MADkitchen\Database\ColumnsHandler::get_table_column_settings_array('TimeTracker', 'timetable', $tags, $prop, $key_out_type, $target);
 }
 
 function ts_query($arg = [], $table = 'timetable') { //TODO:disable LIMIT=100 (number=false, query var)
@@ -91,11 +91,11 @@ function ts_get_id_by_column_value($column, $value, $get_row = false) {
 }
 
 function ts_is_lookup_table($table) {
-    return !empty(MADkitchen\Database\Handler::get_tables_data('TimeTracker', $table)['lookup_table']);
+    return !empty(MADkitchen\Database\TablesHandler::get_tables_data('TimeTracker', $table)['lookup_table']);
 }
 
 function ts_get_table_source($column) {
-    return MADkitchen\Database\Handler::get_source_table('TimeTracker', $column);
+    return MADkitchen\Database\TablesHandler::get_source_table('TimeTracker', $column);
 }
 
 function ts_get_lookup_columns($this_column, $this_table = 'timetable') {

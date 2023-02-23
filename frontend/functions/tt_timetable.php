@@ -64,7 +64,7 @@ function build_table($year = null, $week = null) {
     }
 
     $report_columns = get_timesheet_vars();
-    $primary_key=MADkitchen\Database\Handler::get_primary_key_column_name('TimeTracker', 'timetable');
+    $primary_key=MADkitchen\Database\ColumnsHandler::get_primary_key_column_name('TimeTracker', 'timetable');
     $used_columns = ['date_rec', 'sum_time_units',$primary_key];  //TODO: generalize 'id'?
     $query = [
         'user_name' => $user,
@@ -317,7 +317,7 @@ function ajax_build_row() {
         foreach (['job_tag', 'activity_id'] as $column) {
             $table = ts_get_table_source($column);
             $query_object = ts_query([
-                MADkitchen\Database\Handler::get_primary_key_column_name('TimeTracker', $table) => $_POST[$column],
+                MADkitchen\Database\ColumnsHandler::get_primary_key_column_name('TimeTracker', $table) => $_POST[$column],
                 ], $table);
             $query_object->append_external_columns(get_timesheet_vars());
             $res = array_merge_recursive($res, reset($query_object->items_resolved));

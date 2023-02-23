@@ -211,7 +211,7 @@ function ajax_build_report() {
         );
 
         $query_object2->append_external_columns(get_charts_vars());
-        $items_array = \MADkitchen\Database\Handler::get_columns_array_from_rows($query_object2->items_resolved, get_charts_vars(), true);
+        $items_array = \MADkitchen\Database\ColumnsHandler::get_columns_array_from_rows($query_object2->items_resolved, get_charts_vars(), true);
 
     }
 
@@ -284,7 +284,7 @@ function chart2_get_data($args = [], $date_range = []) {
         'activity_id_name',
     ]);
 
-    return \MADkitchen\Database\Handler::get_columns_array_values_from_rows($x->items_resolved);
+    return \MADkitchen\Database\ColumnsHandler::get_columns_array_values_from_rows($x->items_resolved);
 }
 
 function chart3_get_data($args = [], $date_range = []) {
@@ -310,7 +310,7 @@ function chart3_get_data($args = [], $date_range = []) {
         'activity_group_name',
     ]);
     $x2 = \MADkitchen\Database\Lookup::groupby_items_rows_by_column($x->items_resolved, 'activity_group', ['sum_time_units']);
-    $x3 = \MADkitchen\Database\Handler::get_columns_array_values_from_rows($x2, ['activity_group', 'activity_group_name', 'sum_time_units']);
+    $x3 = \MADkitchen\Database\ColumnsHandler::get_columns_array_values_from_rows($x2, ['activity_group', 'activity_group_name', 'sum_time_units']);
 
     return $x3;
 

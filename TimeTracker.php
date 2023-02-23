@@ -152,18 +152,18 @@ class TimeTracker extends \MADkitchen\Modules\Module {
 
         $this->table_data = array_merge(
                 $this->table_data,
-                \MADkitchen\Database\Handler::create_std_lookup_table('activity_id', "Activities", [
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('activity_id', "Activities", [
                     ['tag' => 'activity_group']
                 ]),
-                \MADkitchen\Database\Handler::create_std_lookup_table('activity_group', "Group of activities"),
-                \MADkitchen\Database\Handler::create_std_lookup_table('job_no', "Job number"),
-                \MADkitchen\Database\Handler::create_std_lookup_table('job_wbs', "Job WBS", [
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('activity_group', "Group of activities"),
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('job_no', "Job number"),
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('job_wbs', "Job WBS", [
                     ['tag' => 'job_no']
                 ]),
-                \MADkitchen\Database\Handler::create_std_lookup_table('job_tag', "Job tag", [['tag' => 'job_wbs']]),
-                \MADkitchen\Database\Handler::create_std_lookup_table('user_group', "Group of user"),
-                \MADkitchen\Database\Handler::create_std_lookup_table('user_role', "Role of users"),
-                \MADkitchen\Database\Handler::create_std_lookup_table('user_name', "Users", [
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('job_tag', "Job tag", [['tag' => 'job_wbs']]),
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('user_group', "Group of user"),
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('user_role', "Role of users"),
+                \MADkitchen\Database\TablesHandler::create_std_lookup_table('user_name', "Users", [
                     ['tag' => 'user_role'],
                     ['tag' => 'user_group'],
                     ['tag' => 'wp_id', 'relation' => false],
